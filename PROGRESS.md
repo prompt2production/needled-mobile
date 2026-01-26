@@ -56,7 +56,18 @@
 ---
 
 ### Task 3: Configure Expo Router with auth/tabs layout
-- **Status:** Pending
+- **Status:** Completed
+- **Started:** 2026-01-26
+- **Completed:** 2026-01-26
+
+**Checklist:**
+- [x] Create root _layout.tsx with TanStack Query provider
+- [x] Create (tabs) layout with bottom tab navigator
+- [x] Create tab screens (Home, Check-in, Injection, Weigh-in, Calendar)
+- [x] Create (auth) layout with welcome, login, register screens
+- [x] Create settings stack layout
+- [x] Create root index.tsx with redirect
+- [x] Create +not-found.tsx error page
 
 ---
 
@@ -106,6 +117,7 @@
 |------|----------------|---------------|
 | 2026-01-26 | Initialize Expo project with dependencies | app.json, package.json, tsconfig.json, tailwind.config.js, metro.config.js, babel.config.js, global.css, app/_layout.tsx, app/index.tsx |
 | 2026-01-26 | Add design system and base UI components | src/constants/theme.ts, src/types/api.ts, src/components/ui/* |
+| 2026-01-26 | Configure Expo Router navigation structure | app/_layout.tsx, app/(tabs)/*, app/(auth)/*, app/settings/* |
 
 ---
 

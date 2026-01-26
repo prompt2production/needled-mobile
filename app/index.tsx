@@ -1,14 +1,12 @@
-import { View, Text } from "react-native";
+import { Redirect } from "expo-router";
 
-export default function Home() {
-  return (
-    <View className="flex-1 items-center justify-center bg-teal-500">
-      <Text className="text-2xl font-bold text-white">
-        Needled App
-      </Text>
-      <Text className="text-white mt-2">
-        Project initialized successfully!
-      </Text>
-    </View>
-  );
+// For now, redirect directly to the main tabs
+// Later, this will check auth state and redirect appropriately
+export default function Index() {
+  // TODO: Check auth state
+  // const { isAuthenticated, isLoading } = useAuth();
+  // if (isLoading) return <SplashScreen />;
+  // if (!isAuthenticated) return <Redirect href="/(auth)/welcome" />;
+
+  return <Redirect href="/(tabs)" />;
 }
