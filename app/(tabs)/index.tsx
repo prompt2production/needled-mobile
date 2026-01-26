@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { View, Text, ScrollView, Pressable, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
@@ -29,19 +29,9 @@ export default function DashboardScreen() {
   const [habits, setHabits] = useState(mockTodayHabits);
   const [showConfetti, setShowConfetti] = useState(false);
   const confettiRef = useRef<any>(null);
-  const prevAllCompleteRef = useRef(false);
 
   // Check if all habits are complete
   const allHabitsComplete = habits.water && habits.nutrition && habits.exercise;
-
-  // Trigger confetti when all habits become complete
-  useEffect(() => {
-    if (allHabitsComplete && !prevAllCompleteRef.current) {
-      setShowConfetti(true);
-      confettiRef.current?.start();
-    }
-    prevAllCompleteRef.current = allHabitsComplete;
-  }, [allHabitsComplete]);
 
   // Calculate Pip state
   const dataForPip = {
@@ -63,29 +53,21 @@ export default function DashboardScreen() {
 
   // Handle habit toggle (demo only)
   const handleHabitPress = (habit: "water" | "nutrition" | "exercise") => {
-    setHabits((prev) => ({
-      ...prev,
-      [habit]: !prev[habit],
-    }));
+    const newHabits = {
+      ...habits,
+      [habit]: !habits[habit],
+    };
+    setHabits(newHabits);
+
+    // Trigger confetti immediately if this completes all habits
+    const willBeAllComplete = newHabits.water && newHabits.nutrition && newHabits.exercise;
+    if (willBeAllComplete && !allHabitsComplete) {
+      setShowConfetti(true);
+    }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
-      {/* Confetti overlay */}
-      {showConfetti && (
-        <ConfettiCannon
-          ref={confettiRef}
-          count={150}
-          origin={{ x: screenWidth / 2, y: -20 }}
-          autoStart={true}
-          fadeOut={true}
-          fallSpeed={3000}
-          explosionSpeed={350}
-          colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
-          onAnimationEnd={() => setShowConfetti(false)}
-        />
-      )}
-
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -161,6 +143,33 @@ export default function DashboardScreen() {
           />
         </View>
       </ScrollView>
+
+      {/* Confetti overlay - on top of everything */}
+      {showConfetti && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        >
+          <ConfettiCannon
+            ref={confettiRef}
+            count={200}
+            origin={{ x: screenWidth / 2, y: 0 }}
+            autoStart={true}
+            fadeOut={true}
+            fallSpeed={2500}
+            explosionSpeed={500}
+            colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
+            onAnimationEnd={() => setShowConfetti(false)}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
