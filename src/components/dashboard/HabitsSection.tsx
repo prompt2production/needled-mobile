@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Card } from "@/components/ui";
 
@@ -17,10 +17,10 @@ interface HabitCardProps {
   subtitle: string;
   icon: string;
   completed: boolean;
-  onPress?: () => void;
+  onPress: () => void;
 }
 
-function HabitCard({
+const HabitCard = memo(function HabitCard({
   title,
   subtitle,
   icon,
@@ -55,9 +55,9 @@ function HabitCard({
       </Card>
     </Pressable>
   );
-}
+});
 
-export function HabitsSection({
+export const HabitsSection = memo(function HabitsSection({
   streak,
   habits,
   onHabitPress,
@@ -65,6 +65,10 @@ export function HabitsSection({
   const completedCount = [habits.water, habits.nutrition, habits.exercise].filter(
     Boolean
   ).length;
+
+  const handleWaterPress = useCallback(() => onHabitPress?.("water"), [onHabitPress]);
+  const handleNutritionPress = useCallback(() => onHabitPress?.("nutrition"), [onHabitPress]);
+  const handleExercisePress = useCallback(() => onHabitPress?.("exercise"), [onHabitPress]);
 
   return (
     <View>
@@ -95,25 +99,25 @@ export function HabitsSection({
           subtitle="8 glasses"
           icon="💧"
           completed={habits.water}
-          onPress={() => onHabitPress?.("water")}
+          onPress={handleWaterPress}
         />
         <HabitCard
           title="Nutrition"
           subtitle="Protein first"
           icon="🥗"
           completed={habits.nutrition}
-          onPress={() => onHabitPress?.("nutrition")}
+          onPress={handleNutritionPress}
         />
         <HabitCard
           title="Exercise"
           subtitle="30 min"
           icon="🏃"
           completed={habits.exercise}
-          onPress={() => onHabitPress?.("exercise")}
+          onPress={handleExercisePress}
         />
       </View>
     </View>
   );
-}
+});
 
 export default HabitsSection;

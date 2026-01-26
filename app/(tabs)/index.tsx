@@ -83,19 +83,23 @@ export default function DashboardScreen() {
   });
 
   // Handle habit toggle (demo only)
-  const handleHabitPress = (habit: "water" | "nutrition" | "exercise") => {
-    const newHabits = {
-      ...habits,
-      [habit]: !habits[habit],
-    };
-    setHabits(newHabits);
+  const handleHabitPress = useCallback((habit: "water" | "nutrition" | "exercise") => {
+    setHabits(prev => {
+      const newHabits = {
+        ...prev,
+        [habit]: !prev[habit],
+      };
 
-    // Trigger celebration if this completes all habits
-    const willBeAllComplete = newHabits.water && newHabits.nutrition && newHabits.exercise;
-    if (willBeAllComplete && !allHabitsComplete) {
-      triggerCelebration();
-    }
-  };
+      // Trigger celebration if this completes all habits
+      const wasAllComplete = prev.water && prev.nutrition && prev.exercise;
+      const willBeAllComplete = newHabits.water && newHabits.nutrition && newHabits.exercise;
+      if (willBeAllComplete && !wasAllComplete) {
+        triggerCelebration();
+      }
+
+      return newHabits;
+    });
+  }, [triggerCelebration]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
@@ -178,12 +182,12 @@ export default function DashboardScreen() {
       {/* Confetti - always mounted, triggered via ref for instant response */}
       <ConfettiCannon
         ref={confettiRef}
-        count={150}
-        origin={{ x: screenWidth / 2, y: -50 }}
+        count={120}
+        origin={{ x: screenWidth / 2, y: -30 }}
         autoStart={false}
         fadeOut={true}
-        fallSpeed={2500}
-        explosionSpeed={300}
+        fallSpeed={2000}
+        explosionSpeed={600}
         colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
         autoStartDelay={0}
       />
