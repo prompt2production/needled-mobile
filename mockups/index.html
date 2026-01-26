@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Needled - Mobile App Mockups</title>
+  <link rel="stylesheet" href="styles/variables.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #2DD4BF 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .hub-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .hub-header__logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .hub-header__logo img {
+      width: 80px;
+      height: auto;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+    }
+
+    .hub-header__title {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .hub-header__subtitle {
+      font-size: 20px;
+      opacity: 0.9;
+      margin-top: 8px;
+    }
+
+    .screens-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .screen-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .screen-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .screen-card__title {
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .screen-card__number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    .screen-card__frame {
+      position: relative;
+      width: 280px;
+      height: 607px;
+      background: #1a1a1a;
+      border-radius: 36px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .screen-card__iframe {
+      width: 375px;
+      height: 812px;
+      border: none;
+      transform: scale(0.747);
+      transform-origin: top left;
+    }
+
+    .screen-card__notch {
+      position: absolute;
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94px;
+      height: 25px;
+      background: #1a1a1a;
+      border-radius: 15px;
+      z-index: 10;
+    }
+
+    .screen-card__link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .screen-card__link:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .screen-card__badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+
+    .screen-card__badge--dark {
+      background: #1E1E2E;
+    }
+
+    .section-divider {
+      width: 100%;
+      max-width: 1800px;
+      margin: 60px auto 40px;
+      text-align: center;
+      color: white;
+    }
+
+    .section-divider__title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .section-divider__subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .footer {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 60px;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .instructions {
+      max-width: 800px;
+      margin: 0 auto 40px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 24px;
+      color: white;
+    }
+
+    .instructions__title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .instructions__list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .instructions__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .instructions__icon {
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .hub-header__title {
+        font-size: 32px;
+      }
+
+      .screens-grid {
+        gap: 24px;
+      }
+
+      .instructions__list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hub-header">
+    <div class="hub-header__logo">
+      <img src="../media/pip-cheerful.png" alt="Pip">
+      <h1 class="hub-header__title">Needled</h1>
+    </div>
+    <p class="hub-header__subtitle">Habit Tracker Mobile App Mockups</p>
+  </header>
+
+  <div class="instructions">
+    <h2 class="instructions__title">Interactive Features</h2>
+    <ul class="instructions__list">
+      <li class="instructions__item">
+        <span class="instructions__icon">tap</span>
+        <span>Tap habit cards to complete them</span>
+      </li>
+      <li class="instructions__item">
+        <span class="instructions__icon">+/-</span>
+        <span>Use steppers to adjust weight</span>
+      </li>
+      <li class="instructions__item">
+        <span class="instructions__icon">btn</span>
+        <span>Click buttons to see state changes</span>
+      </li>
+      <li class="instructions__item">
+        <span class="instructions__icon">nav</span>
+        <span>Navigation links between screens</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="screens-grid">
+    <!-- Dashboard -->
+    <div class="screen-card">
+      <h2 class="screen-card__title">
+        <span class="screen-card__number">1</span>
+        Dashboard
+      </h2>
+      <div class="screen-card__frame">
+        <div class="screen-card__notch"></div>
+        <iframe src="screens/01-dashboard.html" class="screen-card__iframe"></iframe>
+      </div>
+      <a href="screens/01-dashboard.html" class="screen-card__link" target="_blank">Open Full Size</a>
+    </div>
+
+    <!-- Daily Check-in -->
+    <div class="screen-card">
+      <h2 class="screen-card__title">
+        <span class="screen-card__number">2</span>
+        Daily Check-in
+      </h2>
+      <div class="screen-card__frame">
+        <div class="screen-card__notch"></div>
+        <iframe src="screens/02-daily-checkin.html" class="screen-card__iframe"></iframe>
+      </div>
+      <a href="screens/02-daily-checkin.html" class="screen-card__link" target="_blank">Open Full Size</a>
+    </div>
+
+    <!-- Injection Day -->
+    <div class="screen-card">
+      <h2 class="screen-card__title">
+        <span class="screen-card__number">3</span>
+        Injection Day
+      </h2>
+      <div class="screen-card__frame">
+        <div class="screen-card__notch"></div>
+        <iframe src="screens/03-injection-day.html" class="screen-card__iframe"></iframe>
+      </div>
+      <a href="screens/03-injection-day.html" class="screen-card__link" target="_blank">Open Full Size</a>
+    </div>
+
+    <!-- Weekly Weigh-in -->
+    <div class="screen-card">
+      <h2 class="screen-card__title">
+        <span class="screen-card__number">4</span>
+        Weekly Weigh-in
+      </h2>
+      <div class="screen-card__frame">
+        <div class="screen-card__notch"></div>
+        <iframe src="screens/04-weekly-weighin.html" class="screen-card__iframe"></iframe>
+      </div>
+      <a href="screens/04-weekly-weighin.html" class="screen-card__link" target="_blank">Open Full Size</a>
+    </div>
+
+    <!-- Calendar -->
+    <div class="screen-card">
+      <h2 class="screen-card__title">
+        <span class="screen-card__number">5</span>
+        Calendar
+      </h2>
+      <div class="screen-card__frame">
+        <div class="screen-card__notch"></div>
+        <iframe src="screens/05-calendar.html" class="screen-card__iframe"></iframe>
+      </div>
+      <a href="screens/05-calendar.html" class="screen-card__link" target="_blank">Open Full Size</a>
+    </div>
+  </div>
+
+  <!-- Dark Mode Section -->
+  <div class="section-divider">
+    <h2 class="section-divider__title">Dark Mode Variants</h2>
+    <p class="section-divider__subtitle">Alternative color scheme for low-light environments</p>
+  </div>
+
+  <div class="screens-grid">
+    <!-- Dashboard Dark -->
+    <div class="screen-card">
+      <h2 class="screen-card__title">
+        <span class="screen-card__number">1</span>
+        Dashboard
+        <span class="screen-card__badge screen-card__badge--dark">Dark</span>
+      </h2>
+      <div class="screen-card__frame">
+        <div class="screen-card__notch"></div>
+        <iframe src="screens/01-dashboard-dark.html" class="screen-card__iframe"></iframe>
+      </div>
+      <a href="screens/01-dashboard-dark.html" class="screen-card__link" target="_blank">Open Full Size</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Needled Habit Tracker &middot; Featuring Pip the Water Droplet</p>
+    <p style="margin-top: 8px; opacity: 0.7;">Interactive mockups built with HTML, CSS &amp; JavaScript</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Injection Day - Needled</title>
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/phone-frame.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="notch"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-bar__time">9:41</span>
+      <div class="status-bar__icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.46 3 3.34 4.78.29 7.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l10.31 10.3c.4.39 1.04.39 1.41 0l10.3-10.29c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71C19.66 4.78 15.54 3 12 3z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V9h2v7z"/></svg>
+      </div>
+    </div>
+
+    <!-- Screen Content -->
+    <div class="screen-content">
+      <div class="safe-area">
+        <!-- Header -->
+        <div class="screen-header" style="padding: 0 0 var(--space-4) 0;">
+          <button class="screen-header__back" onclick="window.location.href='01-dashboard.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            Back
+          </button>
+          <span class="screen-header__title">Injection Day</span>
+          <span class="screen-header__action"></span>
+        </div>
+
+        <!-- BEFORE STATE -->
+        <div class="screen-state--before">
+          <!-- Date Badge -->
+          <div class="text-center mb-4">
+            <span class="streak-badge" style="background: var(--coral-light);">
+              <span>💉</span>
+              <span>Today is injection day!</span>
+            </span>
+          </div>
+
+          <!-- Pip Encouraging -->
+          <div class="text-center mb-4">
+            <img
+              src="../../media/pip-encouraging.png"
+              alt="Pip - encouraging"
+              class="pip"
+              data-state="encouraging"
+              data-base-path="../../media/"
+              style="width: 160px; height: auto;"
+            >
+          </div>
+
+          <!-- Motivational Message -->
+          <div class="message-card">
+            <div class="message-card__title">You've got this!</div>
+            <div class="message-card__text">
+              Each injection is a step toward your goals. You're doing amazing!
+            </div>
+          </div>
+
+          <!-- Injection Details Card -->
+          <div class="injection-card mb-4">
+            <div class="injection-card__row">
+              <span class="injection-card__label">Medication</span>
+              <span class="injection-card__value">Semaglutide 0.5mg</span>
+            </div>
+            <div class="injection-card__row">
+              <span class="injection-card__label">Suggested Site</span>
+              <span class="injection-card__value">Left thigh</span>
+            </div>
+            <div class="injection-card__row">
+              <span class="injection-card__label">Dose Number</span>
+              <span class="injection-card__value">8 of 12</span>
+            </div>
+            <div class="injection-card__row">
+              <span class="injection-card__label">Time Since Last</span>
+              <span class="injection-card__value">7 days</span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button class="btn btn--primary btn--large" data-action="complete">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Mark as Done
+          </button>
+
+          <div class="text-center mt-4 text-sm text-gray">
+            Reminder: Rotate injection sites each week
+          </div>
+        </div>
+
+        <!-- AFTER STATE (hidden initially) -->
+        <div class="screen-state--after hidden">
+          <!-- Pip Celebrating -->
+          <div class="text-center mb-4">
+            <img
+              src="../../media/pip-celebrating.png"
+              alt="Pip - celebrating"
+              class="pip pip--celebrating"
+              data-state="celebrating"
+              data-base-path="../../media/"
+              style="width: 160px; height: auto;"
+            >
+          </div>
+
+          <!-- Success Message -->
+          <div class="message-card celebration-slide">
+            <div class="message-card__emoji">🎉</div>
+            <div class="message-card__title">Injection Complete!</div>
+            <div class="message-card__text">
+              Great job! You're 67% through your treatment plan. Keep up the amazing work!
+            </div>
+          </div>
+
+          <!-- Confirmation Card -->
+          <div class="card card--tinted mb-4">
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="card__title">Logged</div>
+                <div class="card__value" style="font-size: var(--font-size-lg);">January 27, 2025</div>
+                <div class="card__subtitle">at 9:42 AM</div>
+              </div>
+              <div style="font-size: 40px;">✅</div>
+            </div>
+          </div>
+
+          <!-- Next Injection Info -->
+          <div class="card mb-4">
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="card__title">Next Injection</div>
+                <div class="card__value" style="font-size: var(--font-size-lg);">February 3, 2025</div>
+                <div class="card__subtitle">In 7 days</div>
+              </div>
+              <div style="font-size: 32px;">📅</div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="section">
+            <div class="section__title">Treatment Progress</div>
+            <div class="progress-bar" style="height: 12px;">
+              <div class="progress-bar__fill progress-bar--coral" style="width: 67%;"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-sm text-gray">
+              <span>Dose 8 complete</span>
+              <span>4 remaining</span>
+            </div>
+          </div>
+
+          <button class="btn btn--secondary mt-4" onclick="window.location.href='01-dashboard.html'">
+            Back to Dashboard
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="01-dashboard.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="bottom-nav__label">Home</span>
+      </a>
+      <a href="02-daily-checkin.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span class="bottom-nav__label">Check-in</span>
+      </a>
+      <a href="03-injection-day.html" class="bottom-nav__item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2v4H8l4 4 4-4h-3V2h-2zm0 18v-4h3l-4-4-4 4h3v4h2zm8-9V9h-4V7h4V5h2v2h2v2h-2v2h-2zm-4 4h4v2h-4v4h-2v-4H9v-2h4v-4h2v4z"/></svg>
+        <span class="bottom-nav__label">Injection</span>
+      </a>
+      <a href="04-weekly-weighin.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span class="bottom-nav__label">Weigh-in</span>
+      </a>
+      <a href="05-calendar.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+        <span class="bottom-nav__label">Calendar</span>
+      </a>
+    </nav>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script src="../scripts/interactions.js"></script>
+</body>
+</html>

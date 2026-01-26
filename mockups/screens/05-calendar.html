@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar - Needled</title>
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/phone-frame.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="notch"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-bar__time">9:41</span>
+      <div class="status-bar__icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.46 3 3.34 4.78.29 7.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l10.31 10.3c.4.39 1.04.39 1.41 0l10.3-10.29c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71C19.66 4.78 15.54 3 12 3z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V9h2v7z"/></svg>
+      </div>
+    </div>
+
+    <!-- Screen Content -->
+    <div class="screen-content">
+      <!-- Header with Pip -->
+      <div class="flex justify-between items-center p-4" style="background: var(--teal-50);">
+        <div>
+          <div class="text-lg font-bold">Your Journey</div>
+          <div class="text-sm text-gray">January 2025</div>
+        </div>
+        <img
+          src="../../media/pip-proud.png"
+          alt="Pip - proud"
+          class="pip pip--no-bob"
+          data-state="proud"
+          data-base-path="../../media/"
+          style="width: 80px; height: auto;"
+        >
+      </div>
+
+      <!-- Calendar -->
+      <div class="calendar">
+        <!-- Month Navigation -->
+        <div class="calendar__header">
+          <button class="calendar__nav-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <span class="calendar__month">January 2025</span>
+          <button class="calendar__nav-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Weekday Headers -->
+        <div class="calendar__weekdays">
+          <span class="calendar__weekday">Sun</span>
+          <span class="calendar__weekday">Mon</span>
+          <span class="calendar__weekday">Tue</span>
+          <span class="calendar__weekday">Wed</span>
+          <span class="calendar__weekday">Thu</span>
+          <span class="calendar__weekday">Fri</span>
+          <span class="calendar__weekday">Sat</span>
+        </div>
+
+        <!-- Day Grid -->
+        <div class="calendar__days">
+          <!-- Week 1 (partial) -->
+          <div class="calendar__day calendar__day--empty"></div>
+          <div class="calendar__day calendar__day--empty"></div>
+          <div class="calendar__day calendar__day--empty"></div>
+          <div class="calendar__day">
+            1
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--partial"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            2
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            3
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            4
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            </div>
+          </div>
+
+          <!-- Week 2 -->
+          <div class="calendar__day">
+            5
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--partial"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            6
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--injection"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            7
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            8
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            9
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            10
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            11
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            </div>
+          </div>
+
+          <!-- Week 3 -->
+          <div class="calendar__day">
+            12
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--partial"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            13
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--injection"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            14
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            15
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            16
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            17
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--partial"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            18
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            </div>
+          </div>
+
+          <!-- Week 4 -->
+          <div class="calendar__day">
+            19
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            20
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--injection"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            21
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            22
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            23
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            24
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day">
+            25
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            </div>
+          </div>
+
+          <!-- Week 5 -->
+          <div class="calendar__day">
+            26
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--complete"></span>
+            </div>
+          </div>
+          <div class="calendar__day calendar__day--today">
+            27
+            <div class="calendar__day-indicators">
+              <span class="calendar__indicator calendar__indicator--injection"></span>
+            </div>
+          </div>
+          <div class="calendar__day">28</div>
+          <div class="calendar__day">29</div>
+          <div class="calendar__day">30</div>
+          <div class="calendar__day">31</div>
+          <div class="calendar__day calendar__day--empty"></div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="p-4">
+        <div class="legend">
+          <div class="legend__item">
+            <span class="legend__dot" style="background: var(--teal-500);"></span>
+            <span>All habits</span>
+          </div>
+          <div class="legend__item">
+            <span class="legend__dot" style="background: var(--gray-300);"></span>
+            <span>Some habits</span>
+          </div>
+          <div class="legend__item">
+            <span class="legend__dot" style="background: var(--coral);"></span>
+            <span>Injection</span>
+          </div>
+          <div class="legend__item">
+            <span class="legend__dot" style="background: var(--yellow);"></span>
+            <span>Weigh-in</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Stats -->
+      <div class="p-4">
+        <div class="card">
+          <div class="section__title">January Stats</div>
+          <div class="stats-grid">
+            <div class="text-center">
+              <div class="card__value">85%</div>
+              <div class="text-sm text-gray">Habit streak</div>
+            </div>
+            <div class="text-center">
+              <div class="card__value">4</div>
+              <div class="text-sm text-gray">Injections</div>
+            </div>
+            <div class="text-center">
+              <div class="card__value">4</div>
+              <div class="text-sm text-gray">Weigh-ins</div>
+            </div>
+            <div class="text-center">
+              <div class="card__value text-teal">-7.4</div>
+              <div class="text-sm text-gray">lbs this month</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="01-dashboard.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="bottom-nav__label">Home</span>
+      </a>
+      <a href="02-daily-checkin.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span class="bottom-nav__label">Check-in</span>
+      </a>
+      <a href="03-injection-day.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2v4H8l4 4 4-4h-3V2h-2zm0 18v-4h3l-4-4-4 4h3v4h2zm8-9V9h-4V7h4V5h2v2h2v2h-2v2h-2zm-4 4h4v2h-4v4h-2v-4H9v-2h4v-4h2v4z"/></svg>
+        <span class="bottom-nav__label">Injection</span>
+      </a>
+      <a href="04-weekly-weighin.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span class="bottom-nav__label">Weigh-in</span>
+      </a>
+      <a href="05-calendar.html" class="bottom-nav__item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+        <span class="bottom-nav__label">Calendar</span>
+      </a>
+    </nav>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script src="../scripts/interactions.js"></script>
+</body>
+</html>

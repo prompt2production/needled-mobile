@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Check-in - Needled</title>
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/phone-frame.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="notch"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-bar__time">9:41</span>
+      <div class="status-bar__icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.46 3 3.34 4.78.29 7.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l10.31 10.3c.4.39 1.04.39 1.41 0l10.3-10.29c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71C19.66 4.78 15.54 3 12 3z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V9h2v7z"/></svg>
+      </div>
+    </div>
+
+    <!-- Screen Content -->
+    <div class="screen-content">
+      <div class="safe-area">
+        <!-- Header -->
+        <div class="screen-header" style="padding: 0 0 var(--space-4) 0;">
+          <button class="screen-header__back" onclick="window.location.href='01-dashboard.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            Back
+          </button>
+          <span class="screen-header__title">Daily Check-in</span>
+          <span class="screen-header__action"></span>
+        </div>
+
+        <!-- Date -->
+        <div class="text-center mb-4">
+          <div class="text-sm text-gray">Monday, January 27, 2025</div>
+        </div>
+
+        <!-- Pip -->
+        <div class="text-center mb-4">
+          <img
+            src="../../media/pip-cheerful.png"
+            alt="Pip"
+            class="pip"
+            data-state="cheerful"
+            data-base-path="../../media/"
+            style="width: 140px; height: auto;"
+          >
+          <div class="mt-2 text-gray text-sm">Tap each habit when complete!</div>
+        </div>
+
+        <!-- Habit Cards -->
+        <div class="flex flex-col gap-4 mb-4">
+          <div class="habit-card slide-up stagger-1" style="opacity: 0;">
+            <div class="habit-card__icon" style="font-size: 28px;">💧</div>
+            <div class="habit-card__content">
+              <div class="habit-card__title">Drink Water</div>
+              <div class="habit-card__subtitle">Stay hydrated with 8+ glasses</div>
+            </div>
+            <div class="habit-card__check"></div>
+          </div>
+
+          <div class="habit-card slide-up stagger-2" style="opacity: 0;">
+            <div class="habit-card__icon" style="font-size: 28px;">🥗</div>
+            <div class="habit-card__content">
+              <div class="habit-card__title">Mindful Eating</div>
+              <div class="habit-card__subtitle">Protein-focused, balanced meals</div>
+            </div>
+            <div class="habit-card__check"></div>
+          </div>
+
+          <div class="habit-card slide-up stagger-3" style="opacity: 0;">
+            <div class="habit-card__icon" style="font-size: 28px;">🚶</div>
+            <div class="habit-card__content">
+              <div class="habit-card__title">Move Your Body</div>
+              <div class="habit-card__subtitle">30 minutes of activity</div>
+            </div>
+            <div class="habit-card__check"></div>
+          </div>
+        </div>
+
+        <!-- All Complete Message (hidden initially) -->
+        <div class="all-complete-message hidden">
+          <div class="card card--tinted text-center" style="border: 2px solid var(--teal-500);">
+            <div style="font-size: 32px; margin-bottom: var(--space-2);">🎉</div>
+            <div class="font-bold text-lg">Amazing job!</div>
+            <div class="text-gray text-sm">You've completed all your habits today!</div>
+          </div>
+        </div>
+
+        <!-- Progress Summary -->
+        <div class="mt-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm text-gray">Today's Progress</span>
+            <span class="text-sm font-semibold" id="progress-count">0 of 3</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar__fill" id="progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="01-dashboard.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="bottom-nav__label">Home</span>
+      </a>
+      <a href="02-daily-checkin.html" class="bottom-nav__item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span class="bottom-nav__label">Check-in</span>
+      </a>
+      <a href="03-injection-day.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2v4H8l4 4 4-4h-3V2h-2zm0 18v-4h3l-4-4-4 4h3v4h2zm8-9V9h-4V7h4V5h2v2h2v2h-2v2h-2zm-4 4h4v2h-4v4h-2v-4H9v-2h4v-4h2v4z"/></svg>
+        <span class="bottom-nav__label">Injection</span>
+      </a>
+      <a href="04-weekly-weighin.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span class="bottom-nav__label">Weigh-in</span>
+      </a>
+      <a href="05-calendar.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+        <span class="bottom-nav__label">Calendar</span>
+      </a>
+    </nav>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script src="../scripts/interactions.js"></script>
+  <script>
+    // Custom progress tracking for this screen
+    document.addEventListener('DOMContentLoaded', function() {
+      const habitCards = document.querySelectorAll('.habit-card');
+      const progressCount = document.getElementById('progress-count');
+      const progressFill = document.getElementById('progress-fill');
+
+      function updateProgress() {
+        const completed = document.querySelectorAll('.habit-card.completed').length;
+        const total = habitCards.length;
+        progressCount.textContent = `${completed} of ${total}`;
+        progressFill.style.width = `${(completed / total) * 100}%`;
+      }
+
+      habitCards.forEach(card => {
+        card.addEventListener('click', () => {
+          setTimeout(updateProgress, 50);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Weigh-in - Needled</title>
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/phone-frame.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="notch"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-bar__time">9:41</span>
+      <div class="status-bar__icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.46 3 3.34 4.78.29 7.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l10.31 10.3c.4.39 1.04.39 1.41 0l10.3-10.29c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71C19.66 4.78 15.54 3 12 3z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V9h2v7z"/></svg>
+      </div>
+    </div>
+
+    <!-- Screen Content -->
+    <div class="screen-content">
+      <div class="safe-area">
+        <!-- Header -->
+        <div class="screen-header" style="padding: 0 0 var(--space-4) 0;">
+          <button class="screen-header__back" onclick="window.location.href='01-dashboard.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            Back
+          </button>
+          <span class="screen-header__title">Weekly Weigh-in</span>
+          <span class="screen-header__action"></span>
+        </div>
+
+        <!-- BEFORE STATE (Entry) -->
+        <div class="screen-state--before">
+          <!-- Pip Curious -->
+          <div class="text-center mb-4">
+            <img
+              src="../../media/pip-curious.png"
+              alt="Pip - curious"
+              class="pip"
+              data-state="curious"
+              data-base-path="../../media/"
+              style="width: 120px; height: auto;"
+            >
+          </div>
+
+          <!-- Prompt -->
+          <div class="text-center mb-6">
+            <div class="text-lg font-semibold">Time to check in!</div>
+            <div class="text-sm text-gray">What does the scale say today?</div>
+          </div>
+
+          <!-- Weight Input Stepper -->
+          <div class="card mb-4">
+            <div class="input-stepper">
+              <button class="input-stepper__btn" data-action="decrease">−</button>
+              <div class="input-stepper__value">
+                <div class="input-stepper__number">168.4</div>
+                <div class="input-stepper__unit">lbs</div>
+              </div>
+              <button class="input-stepper__btn" data-action="increase">+</button>
+            </div>
+          </div>
+
+          <!-- Last Week Reference -->
+          <div class="card card--tinted mb-6">
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="card__title">Last Week</div>
+                <div class="font-semibold">170.2 lbs</div>
+              </div>
+              <div>
+                <div class="card__title">4 Weeks Ago</div>
+                <div class="font-semibold">175.8 lbs</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log Button -->
+          <button class="btn btn--primary btn--large" data-action="complete">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+            </svg>
+            Log Weight
+          </button>
+
+          <div class="text-center mt-4 text-sm text-gray">
+            Tip: Weigh yourself at the same time each week
+          </div>
+        </div>
+
+        <!-- AFTER STATE (Confirmation) -->
+        <div class="screen-state--after hidden">
+          <!-- Pip Celebrating -->
+          <div class="text-center mb-4">
+            <img
+              src="../../media/pip-celebrating.png"
+              alt="Pip - celebrating"
+              class="pip pip--celebrating"
+              data-state="celebrating"
+              data-base-path="../../media/"
+              style="width: 140px; height: auto;"
+            >
+          </div>
+
+          <!-- Success Message -->
+          <div class="message-card celebration-slide">
+            <div class="message-card__emoji">🎊</div>
+            <div class="message-card__title">Down 1.8 lbs!</div>
+            <div class="message-card__text">
+              You're making incredible progress. Keep up the great work!
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="stats-grid mb-4">
+            <div class="card text-center">
+              <div class="card__title">This Week</div>
+              <div class="card__value text-teal">-1.8</div>
+              <div class="card__subtitle">lbs</div>
+            </div>
+            <div class="card text-center">
+              <div class="card__title">Total Lost</div>
+              <div class="card__value text-teal">-12.6</div>
+              <div class="card__subtitle">lbs</div>
+            </div>
+          </div>
+
+          <!-- Progress Card -->
+          <div class="card card--tinted mb-4">
+            <div class="section__title">Progress to Goal</div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-bold" style="font-size: var(--font-size-2xl);">168.4 lbs</span>
+              <span class="text-sm text-gray">Goal: 155 lbs</span>
+            </div>
+            <div class="progress-bar" style="height: 12px;">
+              <div class="progress-bar__fill" style="width: 63%;"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-sm text-gray">
+              <span>Started: 181 lbs</span>
+              <span>13.4 lbs to go</span>
+            </div>
+          </div>
+
+          <!-- Milestones -->
+          <div class="card">
+            <div class="section__title">Milestones</div>
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center gap-3">
+                <div style="font-size: 24px;">✅</div>
+                <div>
+                  <div class="font-semibold">Lost first 5 lbs</div>
+                  <div class="text-sm text-gray">January 10</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div style="font-size: 24px;">✅</div>
+                <div>
+                  <div class="font-semibold">Lost first 10 lbs</div>
+                  <div class="text-sm text-gray">January 20</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div style="font-size: 24px; opacity: 0.4;">🎯</div>
+                <div>
+                  <div class="font-semibold text-gray">Under 165 lbs</div>
+                  <div class="text-sm text-gray">3.4 lbs away</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn--secondary mt-4" onclick="window.location.href='01-dashboard.html'">
+            Back to Dashboard
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="01-dashboard.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="bottom-nav__label">Home</span>
+      </a>
+      <a href="02-daily-checkin.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span class="bottom-nav__label">Check-in</span>
+      </a>
+      <a href="03-injection-day.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2v4H8l4 4 4-4h-3V2h-2zm0 18v-4h3l-4-4-4 4h3v4h2zm8-9V9h-4V7h4V5h2v2h2v2h-2v2h-2zm-4 4h4v2h-4v4h-2v-4H9v-2h4v-4h2v4z"/></svg>
+        <span class="bottom-nav__label">Injection</span>
+      </a>
+      <a href="04-weekly-weighin.html" class="bottom-nav__item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span class="bottom-nav__label">Weigh-in</span>
+      </a>
+      <a href="05-calendar.html" class="bottom-nav__item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+        <span class="bottom-nav__label">Calendar</span>
+      </a>
+    </nav>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script src="../scripts/interactions.js"></script>
+</body>
+</html>
