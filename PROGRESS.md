@@ -97,6 +97,24 @@ The dashboard can now be tested on Android emulator with mock data.
 
 ---
 
+### Task 6: Animation and UX Enhancements
+- **Status:** Completed
+- **Started:** 2026-01-26
+- **Completed:** 2026-01-26
+
+**Checklist:**
+- [x] Add floating/bobbing animation to Pip character
+- [x] Add subtle pulse animation to Pip
+- [x] Add celebration bounce animation (temporary, 2 seconds)
+- [x] Add confetti cannon on completing all 3 habits
+- [x] Fix confetti layering (render on top of components)
+- [x] Optimize confetti trigger timing (instant response)
+- [x] Hide confetti origin off-screen until explosion
+- [x] Optimize habit toggle performance with React.memo
+- [x] Add useCallback for stable handler references
+
+---
+
 ## Phase 2: Authentication & Onboarding
 - **Status:** Pending
 
@@ -140,6 +158,11 @@ The dashboard can now be tested on Android emulator with mock data.
 | 2026-01-26 | Add design system and base UI components | src/constants/theme.ts, src/types/api.ts, src/components/ui/* |
 | 2026-01-26 | Configure Expo Router navigation structure | app/_layout.tsx, app/(tabs)/*, app/(auth)/*, app/settings/* |
 | 2026-01-26 | Add mocked dashboard for UI validation | src/components/pip/*, src/components/dashboard/*, src/lib/*, app/(tabs)/index.tsx |
+| 2026-01-26 | Add floating/bobbing animation to Pip character | src/components/pip/Pip.tsx |
+| 2026-01-26 | Add confetti celebration on all habits complete | app/(tabs)/index.tsx, package.json |
+| 2026-01-26 | Fix confetti layering and timing | app/(tabs)/index.tsx |
+| 2026-01-26 | Add temporary celebration state for Pip | app/(tabs)/index.tsx, src/components/pip/Pip.tsx |
+| 2026-01-26 | Optimize habit toggle performance with memoization | app/(tabs)/index.tsx, src/components/dashboard/HabitsSection.tsx |
 
 ---
 
