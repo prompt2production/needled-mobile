@@ -39,7 +39,19 @@
 ---
 
 ### Task 2: Set up design system and base UI components
-- **Status:** Pending
+- **Status:** Completed
+- **Started:** 2026-01-26
+- **Completed:** 2026-01-26
+
+**Checklist:**
+- [x] Create design tokens in `src/constants/theme.ts`
+- [x] Create TypeScript types in `src/types/api.ts`
+- [x] Create Button component
+- [x] Create Card component (with sub-components)
+- [x] Create Input component
+- [x] Create ProgressBar component
+- [x] Create Text components (Heading1, Heading2, etc.)
+- [x] Create index exports for UI components
 
 ---
 
@@ -93,6 +105,7 @@
 | Date | Commit Message | Files Changed |
 |------|----------------|---------------|
 | 2026-01-26 | Initialize Expo project with dependencies | app.json, package.json, tsconfig.json, tailwind.config.js, metro.config.js, babel.config.js, global.css, app/_layout.tsx, app/index.tsx |
+| 2026-01-26 | Add design system and base UI components | src/constants/theme.ts, src/types/api.ts, src/components/ui/* |
 
 ---
 
