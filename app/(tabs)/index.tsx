@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { View, Text, ScrollView, Pressable, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
@@ -27,11 +27,37 @@ export default function DashboardScreen() {
 
   // Local state for habits (for demo toggling)
   const [habits, setHabits] = useState(mockTodayHabits);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [isCelebrating, setIsCelebrating] = useState(false);
   const confettiRef = useRef<any>(null);
+  const celebrationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if all habits are complete
   const allHabitsComplete = habits.water && habits.nutrition && habits.exercise;
+
+  // Trigger celebration (confetti + temporary Pip state)
+  const triggerCelebration = useCallback(() => {
+    confettiRef.current?.start();
+    setIsCelebrating(true);
+
+    // Clear any existing timeout
+    if (celebrationTimeoutRef.current) {
+      clearTimeout(celebrationTimeoutRef.current);
+    }
+
+    // Revert after 2 seconds
+    celebrationTimeoutRef.current = setTimeout(() => {
+      setIsCelebrating(false);
+    }, 2000);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (celebrationTimeoutRef.current) {
+        clearTimeout(celebrationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Calculate Pip state
   const dataForPip = {
@@ -41,7 +67,12 @@ export default function DashboardScreen() {
       todayCompleted: Object.values(habits).filter(Boolean).length,
     },
   };
-  const pipState = determinePipState(dataForPip);
+  const basePipState = determinePipState(dataForPip);
+
+  // Override with celebrating state temporarily
+  const pipState = isCelebrating
+    ? { state: "celebrating" as const, message: "All habits done today! You're absolutely crushing it!" }
+    : basePipState;
 
   // Get current date info
   const today = new Date();
@@ -59,10 +90,10 @@ export default function DashboardScreen() {
     };
     setHabits(newHabits);
 
-    // Trigger confetti immediately if this completes all habits
+    // Trigger celebration if this completes all habits
     const willBeAllComplete = newHabits.water && newHabits.nutrition && newHabits.exercise;
     if (willBeAllComplete && !allHabitsComplete) {
-      setShowConfetti(true);
+      triggerCelebration();
     }
   };
 
@@ -144,32 +175,18 @@ export default function DashboardScreen() {
         </View>
       </ScrollView>
 
-      {/* Confetti overlay - on top of everything */}
-      {showConfetti && (
-        <View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        >
-          <ConfettiCannon
-            ref={confettiRef}
-            count={200}
-            origin={{ x: screenWidth / 2, y: 0 }}
-            autoStart={true}
-            fadeOut={true}
-            fallSpeed={2500}
-            explosionSpeed={500}
-            colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
-            onAnimationEnd={() => setShowConfetti(false)}
-          />
-        </View>
-      )}
+      {/* Confetti - always mounted, triggered via ref for instant response */}
+      <ConfettiCannon
+        ref={confettiRef}
+        count={150}
+        origin={{ x: screenWidth / 2, y: -50 }}
+        autoStart={false}
+        fadeOut={true}
+        fallSpeed={2500}
+        explosionSpeed={300}
+        colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
+        autoStartDelay={0}
+      />
     </SafeAreaView>
   );
 }
