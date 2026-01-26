@@ -50,7 +50,7 @@ export const mockInjectionStatus: InjectionStatusResponse = {
   dosesRemaining: 2,
 };
 
-// Mock today's habits
+// Mock today's habits (2 of 3 complete - tap Exercise to trigger confetti!)
 export const mockTodayHabits = {
   water: true,
   nutrition: true,

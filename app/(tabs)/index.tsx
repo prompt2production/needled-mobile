@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, ScrollView, Pressable, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
+import ConfettiCannon from "react-native-confetti-cannon";
 
 import { PipWithBubble } from "@/components/pip";
 import {
@@ -17,6 +18,8 @@ import {
   getInjectionDayName,
 } from "@/lib/mock-data";
 
+const { width: screenWidth } = Dimensions.get("window");
+
 export default function DashboardScreen() {
   // Use mock data for now
   const dashboardData = mockDashboardData;
@@ -24,6 +27,21 @@ export default function DashboardScreen() {
 
   // Local state for habits (for demo toggling)
   const [habits, setHabits] = useState(mockTodayHabits);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiRef = useRef<any>(null);
+  const prevAllCompleteRef = useRef(false);
+
+  // Check if all habits are complete
+  const allHabitsComplete = habits.water && habits.nutrition && habits.exercise;
+
+  // Trigger confetti when all habits become complete
+  useEffect(() => {
+    if (allHabitsComplete && !prevAllCompleteRef.current) {
+      setShowConfetti(true);
+      confettiRef.current?.start();
+    }
+    prevAllCompleteRef.current = allHabitsComplete;
+  }, [allHabitsComplete]);
 
   // Calculate Pip state
   const dataForPip = {
@@ -53,6 +71,21 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+      {/* Confetti overlay */}
+      {showConfetti && (
+        <ConfettiCannon
+          ref={confettiRef}
+          count={150}
+          origin={{ x: screenWidth / 2, y: -20 }}
+          autoStart={true}
+          fadeOut={true}
+          fallSpeed={3000}
+          explosionSpeed={350}
+          colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
+          onAnimationEnd={() => setShowConfetti(false)}
+        />
+      )}
+
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
