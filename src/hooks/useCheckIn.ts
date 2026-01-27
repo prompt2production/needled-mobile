@@ -7,13 +7,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import * as habitsService from '../services/habits';
 import { HabitType, DailyHabit } from '../types/api';
+import { habitsKeys } from './useDashboard';
 
-// Query keys
+// Query keys for check-in specific data
 export const checkInKeys = {
   all: ['checkin'] as const,
-  habits: (userId: string, date: string) => [...checkInKeys.all, 'habits', userId, date] as const,
   weekHistory: (userId: string, endDate: string) => [...checkInKeys.all, 'week', userId, endDate] as const,
 };
+
+// Re-export habitsKeys for consistency
+export { habitsKeys };
 
 /**
  * Format date as YYYY-MM-DD in local timezone
@@ -84,14 +87,14 @@ export function getDayAbbreviation(date: Date): string {
 /**
  * Fetch habits for today only
  * Uses getTodayHabits endpoint which creates a record if it doesn't exist
+ * Uses same cache key as dashboard (habitsKeys.today) so both screens stay in sync
  */
 export function useTodayHabitsForCheckIn() {
   const { user } = useAuthStore();
   const userId = user?.id;
-  const dateStr = formatDate(new Date());
 
   return useQuery({
-    queryKey: checkInKeys.habits(userId || '', dateStr),
+    queryKey: habitsKeys.today(userId || ''),
     queryFn: () => habitsService.getTodayHabits(userId!),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -150,34 +153,44 @@ export function useWeeklyHabits() {
 
 /**
  * Toggle habit mutation with optimistic updates
+ * Updates both the today cache (shared with dashboard) and weekly cache
  */
 export function useToggleHabitForDate(date: Date) {
   const { user } = useAuthStore();
   const userId = user?.id;
   const dateStr = formatDate(date);
+  const isTodayDate = isToday(date);
   const queryClient = useQueryClient();
   const today = getStartOfDay(new Date());
   const weeklyQueryKey = checkInKeys.weekHistory(userId || '', formatDate(today));
+  // For today, use the shared habitsKeys.today (same as dashboard)
+  const todayQueryKey = habitsKeys.today(userId || '');
 
   return useMutation({
     mutationFn: ({ habit, value }: { habit: HabitType; value: boolean }) =>
       habitsService.toggleHabit(userId!, habit, value, dateStr),
 
-    // Optimistic update for both single date and weekly caches
+    // Optimistic update for today cache (if today) and weekly cache
     onMutate: async ({ habit, value }) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: checkInKeys.habits(userId || '', dateStr) });
+      if (isTodayDate) {
+        await queryClient.cancelQueries({ queryKey: todayQueryKey });
+      }
       await queryClient.cancelQueries({ queryKey: weeklyQueryKey });
 
       // Snapshot previous values
-      const previousHabits = queryClient.getQueryData(checkInKeys.habits(userId || '', dateStr));
+      const previousToday = isTodayDate
+        ? queryClient.getQueryData(todayQueryKey)
+        : undefined;
       const previousWeekly = queryClient.getQueryData<DailyHabit[]>(weeklyQueryKey);
 
-      // Optimistically update single date cache
-      queryClient.setQueryData(checkInKeys.habits(userId || '', dateStr), (old: DailyHabit | undefined) => ({
-        ...old,
-        [habit]: value,
-      }));
+      // Optimistically update today's cache (shared with dashboard)
+      if (isTodayDate) {
+        queryClient.setQueryData(todayQueryKey, (old: DailyHabit | undefined) => ({
+          ...old,
+          [habit]: value,
+        }));
+      }
 
       // Optimistically update weekly cache (raw array data)
       if (previousWeekly) {
@@ -209,12 +222,15 @@ export function useToggleHabitForDate(date: Date) {
         });
       }
 
-      return { previousHabits, previousWeekly };
+      return { previousToday, previousWeekly };
     },
 
     // Update cache with server response
     onSuccess: (data) => {
-      queryClient.setQueryData(checkInKeys.habits(userId || '', dateStr), data);
+      // Update today's cache if this is today (shared with dashboard)
+      if (isTodayDate) {
+        queryClient.setQueryData(todayQueryKey, data);
+      }
 
       // Also update weekly cache with the server response
       queryClient.setQueryData<DailyHabit[]>(weeklyQueryKey, (old) => {
@@ -230,8 +246,8 @@ export function useToggleHabitForDate(date: Date) {
 
     // Rollback on error
     onError: (err, variables, context) => {
-      if (context?.previousHabits) {
-        queryClient.setQueryData(checkInKeys.habits(userId || '', dateStr), context.previousHabits);
+      if (isTodayDate && context?.previousToday) {
+        queryClient.setQueryData(todayQueryKey, context.previousToday);
       }
       if (context?.previousWeekly) {
         queryClient.setQueryData(weeklyQueryKey, context.previousWeekly);
