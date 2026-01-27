@@ -154,39 +154,85 @@ export function useToggleHabitForDate(date: Date) {
   const userId = user?.id;
   const dateStr = formatDate(date);
   const queryClient = useQueryClient();
+  const today = getStartOfDay(new Date());
+  const weeklyQueryKey = checkInKeys.weekHistory(userId || '', formatDate(today));
 
   return useMutation({
     mutationFn: ({ habit, value }: { habit: HabitType; value: boolean }) =>
       habitsService.toggleHabit(userId!, habit, value, dateStr),
 
-    // Optimistic update
+    // Optimistic update for both single date and weekly caches
     onMutate: async ({ habit, value }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: checkInKeys.habits(userId || '', dateStr) });
+      await queryClient.cancelQueries({ queryKey: weeklyQueryKey });
 
-      // Snapshot previous value
+      // Snapshot previous values
       const previousHabits = queryClient.getQueryData(checkInKeys.habits(userId || '', dateStr));
+      const previousWeekly = queryClient.getQueryData<DailyHabit[]>(weeklyQueryKey);
 
-      // Optimistically update
+      // Optimistically update single date cache
       queryClient.setQueryData(checkInKeys.habits(userId || '', dateStr), (old: DailyHabit | undefined) => ({
         ...old,
         [habit]: value,
       }));
 
-      return { previousHabits };
+      // Optimistically update weekly cache (raw array data)
+      if (previousWeekly) {
+        queryClient.setQueryData<DailyHabit[]>(weeklyQueryKey, (old) => {
+          if (!old) return old;
+          const updated = old.map((h) => {
+            // Match by date (handle both ISO string and date-only formats)
+            const habitDate = h.date.split('T')[0];
+            if (habitDate === dateStr) {
+              return { ...h, [habit]: value };
+            }
+            return h;
+          });
+          // If this date wasn't in the weekly data, add it
+          const exists = updated.some((h) => h.date.split('T')[0] === dateStr);
+          if (!exists) {
+            updated.push({
+              id: '',
+              userId: userId || '',
+              date: dateStr,
+              water: habit === 'water' ? value : false,
+              nutrition: habit === 'nutrition' ? value : false,
+              exercise: habit === 'exercise' ? value : false,
+              createdAt: '',
+              updatedAt: '',
+            });
+          }
+          return updated;
+        });
+      }
+
+      return { previousHabits, previousWeekly };
     },
 
     // Update cache with server response
     onSuccess: (data) => {
       queryClient.setQueryData(checkInKeys.habits(userId || '', dateStr), data);
-      // Also invalidate weekly history to keep it in sync
-      queryClient.invalidateQueries({ queryKey: checkInKeys.weekHistory(userId || '', formatDate(new Date())) });
+
+      // Also update weekly cache with the server response
+      queryClient.setQueryData<DailyHabit[]>(weeklyQueryKey, (old) => {
+        if (!old) return [data];
+        const habitDate = data.date.split('T')[0];
+        const exists = old.some((h) => h.date.split('T')[0] === habitDate);
+        if (exists) {
+          return old.map((h) => h.date.split('T')[0] === habitDate ? data : h);
+        }
+        return [...old, data];
+      });
     },
 
     // Rollback on error
     onError: (err, variables, context) => {
       if (context?.previousHabits) {
         queryClient.setQueryData(checkInKeys.habits(userId || '', dateStr), context.previousHabits);
+      }
+      if (context?.previousWeekly) {
+        queryClient.setQueryData(weeklyQueryKey, context.previousWeekly);
       }
     },
   });
