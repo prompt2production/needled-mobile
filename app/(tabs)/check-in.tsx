@@ -445,7 +445,10 @@ export default function CheckInScreen() {
   const allComplete = completedCount === 3;
 
   // Determine Pip state and message based on completion
+  // Note: "celebrating" is only for the brief celebration animation (4 seconds)
+  // After that, "proud" is used for completed habits (calmer animation)
   const getPipStateAndMessage = () => {
+    // Temporary celebration state (triggered when completing all habits)
     if (isCelebrating) {
       return {
         state: "celebrating" as const,
@@ -453,18 +456,19 @@ export default function CheckInScreen() {
       };
     }
 
+    // All complete but not in celebration mode - show proud (calmer)
     if (allComplete) {
       return {
-        state: "celebrating" as const,
+        state: "proud" as const,
         message: isTodaySelected
-          ? "All habits done today! You're absolutely crushing it!"
+          ? "All habits done! You're doing amazing!"
           : "You completed all habits this day. Great job!",
       };
     }
 
     if (completedCount === 2) {
       return {
-        state: "proud" as const,
+        state: "encouraging" as const,
         message: isTodaySelected
           ? "Almost there! Just one more habit to go!"
           : "2 out of 3 habits done. So close!",
@@ -473,7 +477,7 @@ export default function CheckInScreen() {
 
     if (completedCount === 1) {
       return {
-        state: "encouraging" as const,
+        state: "cheerful" as const,
         message: isTodaySelected
           ? "Good start! Keep the momentum going!"
           : "1 habit checked off. You can add more!",
