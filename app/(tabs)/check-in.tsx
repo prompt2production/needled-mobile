@@ -26,6 +26,7 @@ import {
   getLast7Days,
   getDayAbbreviation,
 } from "@/hooks";
+import { PipWithBubble, PipState } from "@/components/pip";
 import { HabitType } from "@/types/api";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -443,6 +444,52 @@ export default function CheckInScreen() {
   const completedCount = [habits.water, habits.nutrition, habits.exercise].filter(Boolean).length;
   const allComplete = completedCount === 3;
 
+  // Determine Pip state and message based on completion
+  const getPipStateAndMessage = () => {
+    if (isCelebrating) {
+      return {
+        state: "celebrating" as const,
+        message: "All habits done today! You're absolutely crushing it!",
+      };
+    }
+
+    if (allComplete) {
+      return {
+        state: "celebrating" as const,
+        message: isTodaySelected
+          ? "All habits done today! You're absolutely crushing it!"
+          : "You completed all habits this day. Great job!",
+      };
+    }
+
+    if (completedCount === 2) {
+      return {
+        state: "proud" as const,
+        message: isTodaySelected
+          ? "Almost there! Just one more habit to go!"
+          : "2 out of 3 habits done. So close!",
+      };
+    }
+
+    if (completedCount === 1) {
+      return {
+        state: "encouraging" as const,
+        message: isTodaySelected
+          ? "Good start! Keep the momentum going!"
+          : "1 habit checked off. You can add more!",
+      };
+    }
+
+    return {
+      state: "cheerful" as const,
+      message: isTodaySelected
+        ? "Ready to check in? Let's build healthy habits together!"
+        : "No habits logged this day. Want to add some?",
+    };
+  };
+
+  const { state: pipState, message: pipMessage } = getPipStateAndMessage();
+
   // Check if can navigate
   const canGoBack = formatDate(selectedDate) > formatDate(getDaysAgo(6));
   const canGoForward = !isTodaySelected;
@@ -601,72 +648,13 @@ export default function CheckInScreen() {
           </View>
         </View>
 
-        {/* Progress Summary */}
+        {/* Pip with Speech Bubble */}
         <View className="px-4 py-4">
-          <View
-            style={{
-              backgroundColor: allComplete
-                ? isDark
-                  ? "rgba(20, 184, 166, 0.15)"
-                  : "#F0FDFA"
-                : isDark
-                ? "#1E1E2E"
-                : "#FFFFFF",
-              borderRadius: 20,
-              padding: 20,
-              alignItems: "center",
-              borderWidth: allComplete ? 2 : 0,
-              borderColor: "#14B8A6",
-            }}
-          >
-            {allComplete ? (
-              <>
-                <Text style={{ fontSize: 40, marginBottom: 8 }}>🎉</Text>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "700",
-                    color: "#14B8A6",
-                    marginBottom: 4,
-                  }}
-                >
-                  All Done!
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: isDark ? "#9CA3AF" : "#6B7280",
-                    textAlign: "center",
-                  }}
-                >
-                  You've completed all your habits{" "}
-                  {isTodaySelected ? "today" : "for this day"}
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text
-                  style={{
-                    fontSize: 48,
-                    fontWeight: "700",
-                    color: "#14B8A6",
-                    marginBottom: 4,
-                  }}
-                >
-                  {completedCount}/3
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: isDark ? "#9CA3AF" : "#6B7280",
-                  }}
-                >
-                  habits completed{" "}
-                  {isTodaySelected ? "today" : "this day"}
-                </Text>
-              </>
-            )}
-          </View>
+          <PipWithBubble
+            state={pipState}
+            message={pipMessage}
+            size="md"
+          />
         </View>
 
         {/* Habit Cards */}
