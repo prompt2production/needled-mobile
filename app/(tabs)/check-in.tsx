@@ -15,9 +15,10 @@ import * as Haptics from "expo-haptics";
 import ConfettiCannon from "react-native-confetti-cannon";
 
 import {
-  useHabitsForDate,
+  useTodayHabitsForCheckIn,
   useWeeklyHabits,
   useToggleHabitForDate,
+  getHabitsFromWeeklyCache,
   formatDate,
   getStartOfDay,
   getDaysAgo,
@@ -322,21 +323,33 @@ export default function CheckInScreen() {
 
   // Selected date state
   const [selectedDate, setSelectedDate] = useState(() => getStartOfDay(new Date()));
+  const isTodaySelected = isToday(selectedDate);
 
-  // Fetch habits for selected date
+  // Fetch today's habits (separate endpoint that creates record if needed)
   const {
-    data: habitsData,
-    isLoading: habitsLoading,
-    error: habitsError,
-    refetch: refetchHabits,
-  } = useHabitsForDate(selectedDate);
+    data: todayHabitsData,
+    isLoading: todayLoading,
+    error: todayError,
+    refetch: refetchToday,
+  } = useTodayHabitsForCheckIn();
 
-  // Fetch weekly history
+  // Fetch weekly history - single source of truth for all dates
   const {
     data: weeklyHabits,
     isLoading: weeklyLoading,
+    error: weeklyError,
     refetch: refetchWeekly,
   } = useWeeklyHabits();
+
+  // Get habits for selected date:
+  // - Today: use dedicated today query (creates record if doesn't exist)
+  // - Past dates: derive from weekly cache (ensures grid dots and cards match)
+  const habitsData = isTodaySelected
+    ? todayHabitsData
+    : getHabitsFromWeeklyCache(weeklyHabits, selectedDate);
+
+  const habitsLoading = isTodaySelected ? todayLoading : weeklyLoading;
+  const habitsError = isTodaySelected ? todayError : weeklyError;
 
   // Toggle mutation for selected date
   const toggleHabitMutation = useToggleHabitForDate(selectedDate);
@@ -350,9 +363,9 @@ export default function CheckInScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([refetchHabits(), refetchWeekly()]);
+    await Promise.all([refetchToday(), refetchWeekly()]);
     setRefreshing(false);
-  }, [refetchHabits, refetchWeekly]);
+  }, [refetchToday, refetchWeekly]);
 
   // Trigger celebration
   const triggerCelebration = useCallback(() => {
@@ -430,7 +443,6 @@ export default function CheckInScreen() {
   }, [selectedDate]);
 
   // Format selected date for display
-  const isTodaySelected = isToday(selectedDate);
   const dateDisplay = isTodaySelected
     ? "Today"
     : selectedDate.toLocaleDateString("en-US", {

@@ -82,41 +82,43 @@ export function getDayAbbreviation(date: Date): string {
 }
 
 /**
- * Fetch habits for a specific date
- * If date is today, uses getTodayHabits (creates if doesn't exist)
- * Otherwise, fetches from history
+ * Fetch habits for today only
+ * Uses getTodayHabits endpoint which creates a record if it doesn't exist
  */
-export function useHabitsForDate(date: Date) {
+export function useTodayHabitsForCheckIn() {
   const { user } = useAuthStore();
   const userId = user?.id;
-  const dateStr = formatDate(date);
-  const todayCheck = isToday(date);
+  const dateStr = formatDate(new Date());
 
   return useQuery({
     queryKey: checkInKeys.habits(userId || '', dateStr),
-    queryFn: async () => {
-      if (todayCheck) {
-        // For today, use the dedicated endpoint that creates if doesn't exist
-        return habitsService.getTodayHabits(userId!);
-      } else {
-        // For past dates, fetch from history
-        const habits = await habitsService.getHabits(userId!, dateStr, dateStr);
-        // Return the habit record for this date, or a default empty one
-        return habits[0] || {
-          id: '',
-          userId: userId!,
-          date: dateStr,
-          water: false,
-          nutrition: false,
-          exercise: false,
-          createdAt: '',
-          updatedAt: '',
-        } as DailyHabit;
-      }
-    },
-    enabled: !!userId && !isFuture(date),
+    queryFn: () => habitsService.getTodayHabits(userId!),
+    enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+}
+
+/**
+ * Get habits for a specific date from weekly cache
+ * This ensures habit cards and weekly grid dots use the same data source
+ */
+export function getHabitsFromWeeklyCache(
+  weeklyHabits: Map<string, DailyHabit> | undefined,
+  date: Date
+): DailyHabit {
+  const dateStr = formatDate(date);
+  const habit = weeklyHabits?.get(dateStr);
+
+  return habit || {
+    id: '',
+    userId: '',
+    date: dateStr,
+    water: false,
+    nutrition: false,
+    exercise: false,
+    createdAt: '',
+    updatedAt: '',
+  };
 }
 
 /**

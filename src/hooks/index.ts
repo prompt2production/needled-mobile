@@ -14,9 +14,10 @@ export {
 } from './useDashboard';
 
 export {
-  useHabitsForDate,
+  useTodayHabitsForCheckIn,
   useWeeklyHabits,
   useToggleHabitForDate,
+  getHabitsFromWeeklyCache,
   checkInKeys,
   formatDate,
   getStartOfDay,
