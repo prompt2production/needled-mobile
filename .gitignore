@@ -30,8 +30,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# Environment files (all variants)
+.env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -39,3 +41,22 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# IDE / Editor configs
+.idea/
+.vscode/
+
+# Expo EAS (may contain build credentials)
+eas.json
+
+# OS files
+Thumbs.db
+
+# Build outputs
+*.apk
+*.aab
+*.ipa
+
+# Logs
+*.log
+logs/
