@@ -52,26 +52,57 @@ Colors are defined in `tailwind.config.js`:
 
 ## Running the App
 ```bash
-# Start development server
-npx expo start
+# Start development server (use port 8082 to avoid conflicts)
+npx expo start --port 8082
 
 # Run on Android (requires Android Studio)
-npx expo start --android
+npx expo start --android --port 8082
 
 # Run on web (for quick testing)
-npx expo start --web
+npx expo start --web --port 8082
 ```
 
-## API Documentation
+## API Configuration
 - Full API docs: `docs/API_DOCUMENTATION.md`
-- Quick reference: `docs/API_QUICK_REFERENCE.md`
-- Base URL: TBD (currently using mock data for development)
+- Base URL configured in `src/services/api.ts`
+- Default: `http://localhost:2810/api`
+- For physical device: Set `EXPO_PUBLIC_API_URL` env var to machine's IP
+- See `.env.example` for configuration options
+
+## Current Implementation Status (as of Jan 2026)
+
+### Completed Features
+- **Auth Flow**: Login, Register, Logout with secure token storage (expo-secure-store)
+- **Welcome Screen**: Animated Pip mascot with login/register navigation
+- **Dashboard**: Connected to real API with TanStack Query hooks
+  - User greeting with real name
+  - Injection status card (days until next dose)
+  - Weight progress card (handles null values for new users)
+  - Habits section with optimistic toggle updates
+  - Pull-to-refresh functionality
+  - Confetti celebration on all habits complete
+- **Settings Screen**: User info display, logout functionality
+
+### Key Implementation Details
+- Auth token stored securely via `expo-secure-store`
+- 401 responses trigger automatic logout via API interceptor
+- Dashboard uses TanStack Query hooks (`src/hooks/useDashboard.ts`)
+- Habit toggles use optimistic updates for instant UI feedback
+- Pip mascot has floating/bobbing animation (larger on welcome, subtle on dashboard)
+
+### Next Steps (Pending)
+- Check-in tab (habits logging)
+- Injection tab (log new injections)
+- Weigh-in tab (log weight)
+- Calendar tab (monthly view)
+- Settings screens (profile, notifications, account management)
 
 ## Development Notes
-- Always check `PROGRESS.md` for current implementation status
+- Always check `PROGRESS.md` for detailed implementation status
 - Pip mascot images are in `assets/images/pip/`
 - Design mockups for reference in `mockups/` folder
 - Use NativeWind className prop for styling (Tailwind syntax)
+- Path aliases configured: `@/` maps to `src/` (e.g., `@/hooks`, `@/services`)
 
 ## Commit Guidelines
 - Commit after each feature/task completion

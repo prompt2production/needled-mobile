@@ -212,7 +212,7 @@ function animateProgressBars() {
   });
 }
 
-// Calendar day click handling
+// Calendar day click handling (legacy support)
 function initCalendar() {
   const days = document.querySelectorAll('.calendar__day:not(.calendar__day--empty)');
 
@@ -223,6 +223,217 @@ function initCalendar() {
       // Add active to clicked day
       day.classList.add('calendar__day--selected');
     });
+  });
+}
+
+// Journey Map functionality
+function initJourneyMap() {
+  const journeyDays = document.querySelectorAll('.journey-day:not(.journey-day--empty):not(.journey-day--future)');
+  const pip = document.querySelector('.pip');
+  const speechBubble = document.querySelector('.pip-speech-bubble');
+
+  // Day tap interactions
+  journeyDays.forEach(day => {
+    day.addEventListener('click', () => {
+      // Tap animation
+      day.classList.add('journey-day--tapped');
+      setTimeout(() => day.classList.remove('journey-day--tapped'), 200);
+
+      // Check for milestone day
+      const streak = day.dataset.streak;
+      if (streak) {
+        triggerMilestoneCelebration(parseInt(streak));
+      }
+
+      // Perfect day celebration (100% completion)
+      const completion = day.dataset.completion;
+      if (completion === '100') {
+        triggerMiniCelebration();
+      }
+
+      // Update Pip speech based on day clicked
+      updatePipSpeech(day, pip, speechBubble);
+    });
+  });
+
+  // Animate calendar rows on load with stagger
+  animateCalendarRows();
+
+  // Setup share button
+  initShareButton();
+}
+
+// Animate calendar rows with stagger effect
+function animateCalendarRows() {
+  const calendarDays = document.getElementById('journeyDays');
+  if (!calendarDays) return;
+
+  const days = calendarDays.querySelectorAll('.journey-day');
+  days.forEach((day, index) => {
+    const rowIndex = Math.floor(index / 7);
+    day.style.animationDelay = `${rowIndex * 50}ms`;
+    day.classList.add('calendar-row-animate');
+  });
+}
+
+// Mini celebration for perfect days
+function triggerMiniCelebration() {
+  // Create a small burst of confetti
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+
+  const colors = ['teal', 'success'];
+  for (let i = 0; i < 10; i++) {
+    const confetti = document.createElement('div');
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    confetti.className = `confetti confetti--circle confetti--${color}`;
+    confetti.style.left = `${40 + Math.random() * 20}%`;
+    confetti.style.animationDelay = `${Math.random() * 0.2}s`;
+    confetti.style.animationDuration = `${1 + Math.random()}s`;
+    container.appendChild(confetti);
+  }
+
+  document.body.appendChild(container);
+  setTimeout(() => container.remove(), 2000);
+}
+
+// Milestone celebration with enhanced effects
+function triggerMilestoneCelebration(streakDays) {
+  const pip = document.querySelector('.pip');
+
+  // Create enhanced confetti
+  createConfetti();
+
+  // Pip celebrates
+  if (pip) {
+    const pipController = new PipController(pip);
+    pipController.setState(PipStates.CELEBRATING, true);
+
+    // Update speech bubble
+    const speechBubble = document.querySelector('.pip-speech-bubble');
+    if (speechBubble) {
+      const messages = {
+        7: '"One week strong! 💪"',
+        14: '"Two weeks! Unstoppable!"',
+        30: '"30 DAYS! LEGEND! 🏆"'
+      };
+      speechBubble.textContent = messages[streakDays] || '"Amazing progress!"';
+      speechBubble.classList.add('speech-animate');
+    }
+  }
+
+  // Flash milestone badge
+  const milestoneDay = document.querySelector(`[data-streak="${streakDays}"]`);
+  if (milestoneDay) {
+    milestoneDay.classList.add('milestone-pop');
+    setTimeout(() => milestoneDay.classList.remove('milestone-pop'), 500);
+  }
+}
+
+// Update Pip's speech based on context
+function updatePipSpeech(day, pip, speechBubble) {
+  if (!speechBubble) return;
+
+  const completion = parseInt(day.dataset.completion) || 0;
+  const hasInjection = day.querySelector('.journey-day__badge--injection');
+  const hasWeighin = day.querySelector('.journey-day__badge--weighin');
+  const isToday = day.classList.contains('journey-day--today');
+
+  let message = '';
+
+  if (isToday) {
+    message = '"Today is your day!"';
+  } else if (hasInjection && hasWeighin) {
+    message = '"What a productive day!"';
+  } else if (hasInjection) {
+    message = '"Injection day done! 💉"';
+  } else if (hasWeighin) {
+    message = '"Weigh-in logged! ⚖️"';
+  } else if (completion === 100) {
+    message = '"Perfect day! ⭐"';
+  } else if (completion >= 66) {
+    message = '"Almost there!"';
+  } else if (completion > 0) {
+    message = '"Every step counts!"';
+  } else {
+    message = '"Let\'s get moving!"';
+  }
+
+  speechBubble.textContent = message;
+  speechBubble.classList.remove('speech-animate');
+  // Trigger reflow for animation restart
+  void speechBubble.offsetWidth;
+  speechBubble.classList.add('speech-animate');
+}
+
+// Calculate current streak from journey data
+function calculateCurrentStreak() {
+  const days = document.querySelectorAll('.journey-day[data-completion="100"]');
+  let streak = 0;
+  let currentStreak = 0;
+
+  days.forEach((day, index) => {
+    const dayNum = parseInt(day.dataset.day);
+    const nextDay = days[index + 1];
+    const nextDayNum = nextDay ? parseInt(nextDay.dataset.day) : null;
+
+    if (nextDayNum === dayNum + 1) {
+      currentStreak++;
+    } else {
+      if (currentStreak > streak) {
+        streak = currentStreak + 1;
+      }
+      currentStreak = 0;
+    }
+  });
+
+  return Math.max(streak, currentStreak + 1);
+}
+
+// Update Pip state based on monthly progress
+function updatePipForProgress() {
+  const pip = document.querySelector('.pip');
+  if (!pip) return;
+
+  const completedDays = document.querySelectorAll('.journey-day[data-completion="100"]').length;
+  const totalDays = document.querySelectorAll('.journey-day[data-day]').length;
+  const completionRate = (completedDays / totalDays) * 100;
+
+  const pipController = new PipController(pip);
+
+  if (completionRate >= 80) {
+    pipController.setState(PipStates.PROUD);
+  } else if (completionRate >= 60) {
+    pipController.setState(PipStates.CHEERFUL);
+  } else if (completionRate >= 40) {
+    pipController.setState(PipStates.ENCOURAGING);
+  } else {
+    pipController.setState(PipStates.CURIOUS);
+  }
+}
+
+// Share button functionality
+function initShareButton() {
+  const shareBtn = document.getElementById('shareBtn');
+  if (!shareBtn) return;
+
+  shareBtn.addEventListener('click', () => {
+    // Trigger celebration effect
+    createConfetti();
+
+    // Visual feedback
+    shareBtn.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      shareBtn.style.transform = 'scale(1)';
+    }, 150);
+
+    // In a real app, this would open share dialog
+    // For mockup, just show a visual celebration
+    const pip = document.querySelector('.pip');
+    if (pip) {
+      const pipController = new PipController(pip);
+      pipController.celebrate();
+    }
   });
 }
 
@@ -245,10 +456,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initWeightStepper();
   initScreenStates();
   initCalendar();
+  initJourneyMap();
   initNavigation();
 
   // Animate progress bars after a short delay
   setTimeout(animateProgressBars, 300);
+
+  // Update Pip based on progress after animations settle
+  setTimeout(updatePipForProgress, 500);
 });
 
 // Export for use in individual screens
@@ -256,5 +471,7 @@ window.Needled = {
   PipController,
   PipStates,
   createConfetti,
-  checkAllHabitsComplete
+  checkAllHabitsComplete,
+  triggerMilestoneCelebration,
+  calculateCurrentStreak
 };

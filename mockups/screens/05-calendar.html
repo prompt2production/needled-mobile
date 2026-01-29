@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar - Needled</title>
+  <title>Your Journey - Needled</title>
   <link rel="stylesheet" href="../styles/variables.css">
   <link rel="stylesheet" href="../styles/phone-frame.css">
   <link rel="stylesheet" href="../styles/components.css">
@@ -24,20 +24,27 @@
 
     <!-- Screen Content -->
     <div class="screen-content">
-      <!-- Header with Pip -->
-      <div class="flex justify-between items-center p-4" style="background: var(--teal-50);">
-        <div>
-          <div class="text-lg font-bold">Your Journey</div>
-          <div class="text-sm text-gray">January 2025</div>
+      <!-- Enhanced Journey Header -->
+      <div class="journey-header header-animate">
+        <div class="journey-header__content">
+          <div class="journey-header__title">Your Journey</div>
+          <div class="journey-header__subtitle">January 2025</div>
+          <div class="journey-header__streak-badge">
+            <span>🔥</span>
+            <span>12 day streak!</span>
+          </div>
         </div>
-        <img
-          src="../../media/pip-proud.png"
-          alt="Pip - proud"
-          class="pip pip--no-bob"
-          data-state="proud"
-          data-base-path="../../media/"
-          style="width: 80px; height: auto;"
-        >
+        <div class="pip-container">
+          <div class="pip-speech-bubble speech-animate">"You're on fire!"</div>
+          <img
+            src="../../media/pip-proud.png"
+            alt="Pip - proud"
+            class="pip pip--journey"
+            data-state="proud"
+            data-base-path="../../media/"
+            style="width: 80px; height: auto;"
+          >
+        </div>
       </div>
 
       <!-- Calendar -->
@@ -68,242 +75,455 @@
           <span class="calendar__weekday">Sat</span>
         </div>
 
-        <!-- Day Grid -->
-        <div class="calendar__days">
-          <!-- Week 1 (partial) -->
-          <div class="calendar__day calendar__day--empty"></div>
-          <div class="calendar__day calendar__day--empty"></div>
-          <div class="calendar__day calendar__day--empty"></div>
-          <div class="calendar__day">
-            1
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--partial"></span>
+        <!-- Journey Day Grid -->
+        <div class="calendar__days" id="journeyDays">
+          <!-- Week 1 (partial) - empty days then 1-4 -->
+          <div class="journey-day journey-day--empty"></div>
+          <div class="journey-day journey-day--empty"></div>
+          <div class="journey-day journey-day--empty"></div>
+
+          <!-- Day 1 - 33% completion -->
+          <div class="journey-day journey-day--33" data-day="1" data-completion="33">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="63"/>
+              </svg>
             </div>
+            <span class="journey-day__number">1</span>
           </div>
-          <div class="calendar__day">
-            2
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+
+          <!-- Day 2 - 100% completion, streak start -->
+          <div class="journey-day journey-day--100 journey-day--streak-start" data-day="2" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
+            <span class="journey-day__number">2</span>
           </div>
-          <div class="calendar__day">
-            3
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+
+          <!-- Day 3 - 100% completion, streak continues -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="3" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
+            <span class="journey-day__number">3</span>
           </div>
-          <div class="calendar__day">
-            4
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--weighin"></span>
+
+          <!-- Day 4 - 100% completion + weigh-in -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="4" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">4</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--weighin">⚖️</span>
             </div>
           </div>
 
-          <!-- Week 2 -->
-          <div class="calendar__day">
-            5
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--partial"></span>
+          <!-- Week 2 (5-11) -->
+          <!-- Day 5 - 33% partial -->
+          <div class="journey-day journey-day--33" data-day="5" data-completion="33">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="63"/>
+              </svg>
             </div>
+            <span class="journey-day__number">5</span>
           </div>
-          <div class="calendar__day">
-            6
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--injection"></span>
+
+          <!-- Day 6 - 100% + injection -->
+          <div class="journey-day journey-day--100" data-day="6" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
-          </div>
-          <div class="calendar__day">
-            7
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            8
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            9
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            10
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            11
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            <span class="journey-day__number">6</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--injection">💉</span>
             </div>
           </div>
 
-          <!-- Week 3 -->
-          <div class="calendar__day">
-            12
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--partial"></span>
+          <!-- Day 7 - 100% + 7-day milestone -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue journey-day--milestone-7" data-day="7" data-completion="100" data-streak="7">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
+            <span class="journey-day__number">7</span>
           </div>
-          <div class="calendar__day">
-            13
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--injection"></span>
+
+          <!-- Day 8-10 - 100% streak -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="8" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
+            <span class="journey-day__number">8</span>
           </div>
-          <div class="calendar__day">
-            14
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="9" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
+            <span class="journey-day__number">9</span>
           </div>
-          <div class="calendar__day">
-            15
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="10" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
+            <span class="journey-day__number">10</span>
           </div>
-          <div class="calendar__day">
-            16
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+
+          <!-- Day 11 - 100% + weigh-in -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="11" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
-          </div>
-          <div class="calendar__day">
-            17
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--partial"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            18
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            <span class="journey-day__number">11</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--weighin">⚖️</span>
             </div>
           </div>
 
-          <!-- Week 4 -->
-          <div class="calendar__day">
-            19
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+          <!-- Week 3 (12-18) -->
+          <!-- Day 12 - 66% partial -->
+          <div class="journey-day journey-day--66" data-day="12" data-completion="66">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="32"/>
+              </svg>
             </div>
+            <span class="journey-day__number">12</span>
           </div>
-          <div class="calendar__day">
-            20
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--injection"></span>
+
+          <!-- Day 13 - 100% + injection -->
+          <div class="journey-day journey-day--100" data-day="13" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
             </div>
-          </div>
-          <div class="calendar__day">
-            21
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            22
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            23
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            24
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-            </div>
-          </div>
-          <div class="calendar__day">
-            25
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
-              <span class="calendar__indicator calendar__indicator--weighin"></span>
+            <span class="journey-day__number">13</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--injection">💉</span>
             </div>
           </div>
 
-          <!-- Week 5 -->
-          <div class="calendar__day">
-            26
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--complete"></span>
+          <!-- Day 14-16 - 100% streak, 14 is milestone -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue journey-day--milestone-14" data-day="14" data-completion="100" data-streak="14">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">14</span>
+          </div>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="15" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">15</span>
+          </div>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="16" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">16</span>
+          </div>
+
+          <!-- Day 17 - 66% partial -->
+          <div class="journey-day journey-day--66" data-day="17" data-completion="66">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="32"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">17</span>
+          </div>
+
+          <!-- Day 18 - 100% + weigh-in -->
+          <div class="journey-day journey-day--100" data-day="18" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">18</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--weighin">⚖️</span>
             </div>
           </div>
-          <div class="calendar__day calendar__day--today">
-            27
-            <div class="calendar__day-indicators">
-              <span class="calendar__indicator calendar__indicator--injection"></span>
+
+          <!-- Week 4 (19-25) -->
+          <div class="journey-day journey-day--100 journey-day--streak-start" data-day="19" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">19</span>
+          </div>
+
+          <!-- Day 20 - 100% + injection -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="20" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">20</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--injection">💉</span>
             </div>
           </div>
-          <div class="calendar__day">28</div>
-          <div class="calendar__day">29</div>
-          <div class="calendar__day">30</div>
-          <div class="calendar__day">31</div>
-          <div class="calendar__day calendar__day--empty"></div>
+
+          <!-- Days 21-25 continue streak -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="21" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">21</span>
+          </div>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="22" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">22</span>
+          </div>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="23" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">23</span>
+          </div>
+
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="24" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">24</span>
+          </div>
+
+          <!-- Day 25 - 100% + weigh-in -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="25" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">25</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--weighin">⚖️</span>
+            </div>
+          </div>
+
+          <!-- Week 5 (26-31) -->
+          <div class="journey-day journey-day--100 journey-day--streak-continue" data-day="26" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">26</span>
+          </div>
+
+          <!-- Day 27 - TODAY + injection -->
+          <div class="journey-day journey-day--100 journey-day--today journey-day--streak-continue streak-glow" data-day="27" data-completion="100">
+            <div class="journey-day__ring">
+              <svg viewBox="0 0 36 36">
+                <circle class="journey-day__ring-bg" cx="18" cy="18" r="15"/>
+                <circle class="journey-day__ring-fill" cx="18" cy="18" r="15"
+                  stroke-dasharray="94.2" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <span class="journey-day__number">27</span>
+            <div class="journey-day__badges">
+              <span class="journey-day__badge journey-day__badge--injection">💉</span>
+            </div>
+          </div>
+
+          <!-- Future days 28-31 -->
+          <div class="journey-day journey-day--future" data-day="28">
+            <span class="journey-day__number">28</span>
+          </div>
+          <div class="journey-day journey-day--future" data-day="29">
+            <span class="journey-day__number">29</span>
+          </div>
+          <div class="journey-day journey-day--future" data-day="30">
+            <span class="journey-day__number">30</span>
+          </div>
+          <div class="journey-day journey-day--future" data-day="31">
+            <span class="journey-day__number">31</span>
+          </div>
+          <div class="journey-day journey-day--empty"></div>
         </div>
       </div>
 
-      <!-- Legend -->
+      <!-- Legend - Updated with emoji badges -->
       <div class="p-4">
         <div class="legend">
           <div class="legend__item">
-            <span class="legend__dot" style="background: var(--teal-500);"></span>
-            <span>All habits</span>
+            <span class="legend__badge" style="background: linear-gradient(135deg, var(--teal-200), var(--teal-300));">✓</span>
+            <span>Complete</span>
           </div>
           <div class="legend__item">
-            <span class="legend__dot" style="background: var(--gray-300);"></span>
-            <span>Some habits</span>
+            <span class="legend__dot" style="background: var(--teal-100);"></span>
+            <span>Partial</span>
           </div>
           <div class="legend__item">
-            <span class="legend__dot" style="background: var(--coral);"></span>
+            <span class="legend__badge journey-day__badge--injection">💉</span>
             <span>Injection</span>
           </div>
           <div class="legend__item">
-            <span class="legend__dot" style="background: var(--yellow);"></span>
+            <span class="legend__badge journey-day__badge--weighin">⚖️</span>
             <span>Weigh-in</span>
           </div>
         </div>
       </div>
 
-      <!-- Monthly Stats -->
-      <div class="p-4">
-        <div class="card">
-          <div class="section__title">January Stats</div>
-          <div class="stats-grid">
-            <div class="text-center">
-              <div class="card__value">85%</div>
-              <div class="text-sm text-gray">Habit streak</div>
-            </div>
-            <div class="text-center">
-              <div class="card__value">4</div>
-              <div class="text-sm text-gray">Injections</div>
-            </div>
-            <div class="text-center">
-              <div class="card__value">4</div>
-              <div class="text-sm text-gray">Weigh-ins</div>
-            </div>
-            <div class="text-center">
-              <div class="card__value text-teal">-7.4</div>
-              <div class="text-sm text-gray">lbs this month</div>
+      <!-- Monthly Wins Stats Section -->
+      <div class="monthly-wins stats-animate">
+        <div class="monthly-wins__title">
+          <span>🏆</span> Monthly Wins
+        </div>
+
+        <!-- Hero Stat with Progress Ring -->
+        <div class="hero-stat">
+          <div class="hero-stat__ring">
+            <svg viewBox="0 0 80 80">
+              <circle class="hero-stat__ring-bg" cx="40" cy="40" r="35"/>
+              <circle class="hero-stat__ring-fill hero-stat__ring-fill--animated" cx="40" cy="40" r="35"
+                stroke-dasharray="219.9" stroke-dashoffset="33"/>
+            </svg>
+            <div class="hero-stat__value">85%</div>
+          </div>
+          <div class="hero-stat__content">
+            <div class="hero-stat__label">Habit Completion</div>
+            <div class="hero-stat__comparison">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 15l-6-6-6 6"/>
+              </svg>
+              12% better than December!
             </div>
           </div>
         </div>
+
+        <!-- Stat Cards Grid -->
+        <div class="stat-cards">
+          <div class="stat-card stat-card--coral">
+            <span class="stat-card__icon">💉</span>
+            <span class="stat-card__value">4/4</span>
+            <span class="stat-card__label">Injections</span>
+          </div>
+          <div class="stat-card stat-card--yellow">
+            <span class="stat-card__icon">⚖️</span>
+            <span class="stat-card__value">4</span>
+            <span class="stat-card__label">Weigh-ins</span>
+          </div>
+          <div class="stat-card stat-card--teal">
+            <span class="stat-card__icon">🔥</span>
+            <span class="stat-card__value">12</span>
+            <span class="stat-card__label">Best Streak</span>
+          </div>
+          <div class="stat-card stat-card--green">
+            <span class="stat-card__icon">📉</span>
+            <span class="stat-card__value">-7.4</span>
+            <span class="stat-card__label">lbs lost</span>
+          </div>
+        </div>
+
+        <!-- Share Button -->
+        <button class="share-btn" id="shareBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/>
+            <polyline points="16 6 12 2 8 6"/>
+            <line x1="12" y1="2" x2="12" y2="15"/>
+          </svg>
+          Share Your Progress
+        </button>
       </div>
 
     </div>

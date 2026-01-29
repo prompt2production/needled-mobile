@@ -28,3 +28,53 @@ export {
   getDayAbbreviation,
   calculateStreak,
 } from './useCheckIn';
+
+export {
+  useInjectionStatus as useInjectionStatusForInjection,
+  useInjectionHistory,
+  useLogInjection,
+  injectionQueryKeys,
+} from './useInjections';
+
+export {
+  useLatestWeighIn,
+  useWeighInHistory,
+  useLogWeighIn,
+  weighInKeys,
+} from './useWeighIns';
+
+export {
+  useCalendarMonth,
+  useCalendarDay,
+  calendarKeys,
+  getDaysInMonth,
+  getFirstDayOfMonth,
+  getMonthName,
+  generateCalendarGrid,
+  formatDateString,
+} from './useCalendar';
+
+export {
+  useProfileSettings,
+  useUpdateProfile,
+  useUpdateEmail,
+  useUpdatePassword,
+  useExportData,
+  useDeleteAccount,
+  useNotificationPreferences,
+  useUpdateNotificationPreferences,
+  settingsKeys,
+} from './useSettings';
+
+export {
+  useJourneyData,
+  getCompletionPercent,
+  calculateStreakData,
+  getStreakPosition,
+} from './useJourneyData';
+
+export type {
+  DayCompletion,
+  StreakData,
+  JourneyData,
+} from './useJourneyData';

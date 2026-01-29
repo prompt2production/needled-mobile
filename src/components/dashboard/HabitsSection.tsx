@@ -1,6 +1,13 @@
 import React, { memo, useCallback } from "react";
-import { View, Text, Pressable } from "react-native";
-import { Card } from "@/components/ui";
+import { View, Text, Pressable, useColorScheme, Image, ImageSourcePropType } from "react-native";
+import * as Haptics from "expo-haptics";
+
+// Habit icons
+const habitIcons = {
+  water: require("../../../media/water.png"),
+  nutrition: require("../../../media/nutrition.png"),
+  exercise: require("../../../media/exercise.png"),
+};
 
 export interface HabitsSectionProps {
   streak: number;
@@ -15,7 +22,7 @@ export interface HabitsSectionProps {
 interface HabitCardProps {
   title: string;
   subtitle: string;
-  icon: string;
+  icon: ImageSourcePropType;
   completed: boolean;
   onPress: () => void;
 }
@@ -27,32 +34,75 @@ const HabitCard = memo(function HabitCard({
   completed,
   onPress,
 }: HabitCardProps) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  // Use inline styles for dynamic properties (much faster than dynamic classNames)
+  const cardStyle = {
+    backgroundColor: completed
+      ? (isDark ? "rgba(20, 184, 166, 0.2)" : "#F0FDFA")
+      : (isDark ? "#1E1E2E" : "#FFFFFF"),
+    borderColor: completed
+      ? (isDark ? "#0D9488" : "#99F6E4")
+      : (isDark ? "#374151" : "#E5E7EB"),
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 12,
+    alignItems: "center" as const,
+  };
+
+  const titleStyle = {
+    color: completed
+      ? (isDark ? "#5EEAD4" : "#0F766E")
+      : (isDark ? "#D1D5DB" : "#374151"),
+  };
+
+  const handlePress = useCallback(() => {
+    // Immediate haptic feedback - fires before any state update
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  }, [onPress]);
+
   return (
-    <Pressable onPress={onPress} className="flex-1">
-      <Card
-        variant="outline"
-        padding="sm"
-        className={`items-center ${completed ? "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700" : ""}`}
-      >
-        <Text className="text-2xl mb-1">{icon}</Text>
+    <Pressable onPress={handlePress} style={{ flex: 1 }}>
+      <View style={cardStyle}>
+        <Image source={icon} style={{ width: 32, height: 32, marginBottom: 4 }} />
         <Text
-          className={`text-sm font-semibold text-center ${
-            completed
-              ? "text-teal-700 dark:text-teal-300"
-              : "text-gray-700 dark:text-gray-300"
-          }`}
+          style={[
+            { fontSize: 14, fontWeight: "600", textAlign: "center" },
+            titleStyle,
+          ]}
         >
           {title}
         </Text>
-        <Text className="text-xs text-gray-500 dark:text-gray-400 text-center mt-0.5">
+        <Text
+          style={{
+            fontSize: 12,
+            color: isDark ? "#9CA3AF" : "#6B7280",
+            textAlign: "center",
+            marginTop: 2,
+          }}
+        >
           {subtitle}
         </Text>
         {completed && (
-          <View className="absolute top-1 right-1 bg-teal-500 rounded-full w-5 h-5 items-center justify-center">
-            <Text className="text-white text-xs">✓</Text>
+          <View
+            style={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              backgroundColor: "#14B8A6",
+              borderRadius: 10,
+              width: 20,
+              height: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 12 }}>✓</Text>
           </View>
         )}
-      </Card>
+      </View>
     </Pressable>
   );
 });
@@ -97,21 +147,21 @@ export const HabitsSection = memo(function HabitsSection({
         <HabitCard
           title="Water"
           subtitle="8 glasses"
-          icon="💧"
+          icon={habitIcons.water}
           completed={habits.water}
           onPress={handleWaterPress}
         />
         <HabitCard
           title="Nutrition"
           subtitle="Protein first"
-          icon="🥗"
+          icon={habitIcons.nutrition}
           completed={habits.nutrition}
           onPress={handleNutritionPress}
         />
         <HabitCard
           title="Exercise"
           subtitle="30 min"
-          icon="🏃"
+          icon={habitIcons.exercise}
           completed={habits.exercise}
           onPress={handleExercisePress}
         />

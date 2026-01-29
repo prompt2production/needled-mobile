@@ -1,21 +1,26 @@
 import { Tabs } from "expo-router";
-import { View, Text } from "react-native";
+import { Image } from "react-native";
 import { useColorScheme } from "react-native";
 
-// Simple icon components (we'll use text-based icons for now)
-function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    home: "🏠",
-    "check-in": "✓",
-    injection: "💉",
-    "weigh-in": "⚖️",
-    calendar: "📅",
-  };
+// Tab bar icons
+const tabIcons = {
+  home: require("../../media/home.png"),
+  "check-in": require("../../media/check-in.png"),
+  injection: require("../../media/injection.png"),
+  "weigh-in": require("../../media/weigh-in.png"),
+  calendar: require("../../media/calendar.png"),
+};
 
+function TabIcon({ name, focused }: { name: keyof typeof tabIcons; focused: boolean }) {
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
-      {icons[name] || "•"}
-    </Text>
+    <Image
+      source={tabIcons[name]}
+      style={{
+        width: 24,
+        height: 24,
+        opacity: focused ? 1 : 0.5,
+      }}
+    />
   );
 }
 

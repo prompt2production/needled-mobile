@@ -536,7 +536,7 @@ export default function CheckInScreen() {
             We couldn't load your habits. Please try again.
           </Text>
           <Pressable
-            onPress={() => refetchHabits()}
+            onPress={() => onRefresh()}
             className="bg-teal-500 px-6 py-3 rounded-xl"
           >
             <Text className="text-white font-semibold">Retry</Text>

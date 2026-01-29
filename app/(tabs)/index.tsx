@@ -1,5 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { View, Text, ScrollView, Pressable, Dimensions } from "react-native";
+import React, { useRef, useCallback, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Dimensions,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import ConfettiCannon from "react-native-confetti-cannon";
@@ -11,43 +19,65 @@ import {
   HabitsSection,
 } from "@/components/dashboard";
 import { determinePipState } from "@/lib/pip-logic";
+import { getInjectionDayName } from "@/lib/mock-data";
 import {
-  mockDashboardData,
-  mockInjectionStatus,
-  mockTodayHabits,
-  getInjectionDayName,
-} from "@/lib/mock-data";
+  useDashboardData,
+  useTodayHabits,
+  useInjectionStatus,
+  useToggleHabit,
+} from "@/hooks";
+import { HabitType } from "@/types/api";
 
 const { width: screenWidth } = Dimensions.get("window");
 
 export default function DashboardScreen() {
-  // Use mock data for now
-  const dashboardData = mockDashboardData;
-  const injectionStatus = mockInjectionStatus;
+  // Fetch real data
+  const {
+    data: dashboardData,
+    isLoading: dashboardLoading,
+    error: dashboardError,
+    refetch: refetchDashboard,
+  } = useDashboardData();
 
-  // Local state for habits (for demo toggling)
-  const [habits, setHabits] = useState(mockTodayHabits);
+  const {
+    data: habitsData,
+    isLoading: habitsLoading,
+    refetch: refetchHabits,
+  } = useTodayHabits();
+
+  const {
+    data: injectionStatus,
+    isLoading: injectionLoading,
+    refetch: refetchInjection,
+  } = useInjectionStatus();
+
+  const toggleHabitMutation = useToggleHabit();
+
+  // Local state for celebration
   const [isCelebrating, setIsCelebrating] = useState(false);
   const confettiRef = useRef<any>(null);
-  const celebrationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const celebrationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Check if all habits are complete
-  const allHabitsComplete = habits.water && habits.nutrition && habits.exercise;
+  // Pull-to-refresh
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([refetchDashboard(), refetchHabits(), refetchInjection()]);
+    setRefreshing(false);
+  }, [refetchDashboard, refetchHabits, refetchInjection]);
 
   // Trigger celebration (confetti + temporary Pip state)
   const triggerCelebration = useCallback(() => {
     confettiRef.current?.start();
     setIsCelebrating(true);
 
-    // Clear any existing timeout
     if (celebrationTimeoutRef.current) {
       clearTimeout(celebrationTimeoutRef.current);
     }
 
-    // Revert after 2 seconds
     celebrationTimeoutRef.current = setTimeout(() => {
       setIsCelebrating(false);
-    }, 2000);
+    }, 4000);
   }, []);
 
   // Cleanup timeout on unmount
@@ -59,17 +89,85 @@ export default function DashboardScreen() {
     };
   }, []);
 
-  // Calculate Pip state
-  const dataForPip = {
-    ...dashboardData,
-    habits: {
-      ...dashboardData.habits,
-      todayCompleted: Object.values(habits).filter(Boolean).length,
-    },
-  };
-  const basePipState = determinePipState(dataForPip);
+  // Handle habit toggle
+  const handleHabitPress = useCallback(
+    (habit: HabitType) => {
+      if (!habitsData) return;
+      if (toggleHabitMutation.isPending) return; // Prevent rapid double-taps
 
-  // Override with celebrating state temporarily
+      const currentValue = habitsData[habit];
+      const newValue = !currentValue;
+
+      // Check if this will complete all habits
+      const otherHabits = { ...habitsData, [habit]: newValue };
+      const wasAllComplete = habitsData.water && habitsData.nutrition && habitsData.exercise;
+      const willBeAllComplete = otherHabits.water && otherHabits.nutrition && otherHabits.exercise;
+
+      if (willBeAllComplete && !wasAllComplete) {
+        triggerCelebration();
+      }
+
+      toggleHabitMutation.mutate({ habit, value: newValue });
+    },
+    [habitsData, toggleHabitMutation, triggerCelebration]
+  );
+
+  // Loading state
+  const isLoading = dashboardLoading || habitsLoading || injectionLoading;
+
+  if (isLoading && !dashboardData) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#2C9C91" />
+          <Text className="text-gray-500 dark:text-gray-400 mt-4">
+            Loading your dashboard...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (dashboardError) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+        <View className="flex-1 items-center justify-center p-6">
+          <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            Oops!
+          </Text>
+          <Text className="text-gray-500 dark:text-gray-400 text-center mb-4">
+            We couldn't load your dashboard. Please try again.
+          </Text>
+          <Pressable
+            onPress={() => refetchDashboard()}
+            className="bg-teal-500 px-6 py-3 rounded-xl"
+          >
+            <Text className="text-white font-semibold">Retry</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Data is loaded
+  const habits = habitsData || { water: false, nutrition: false, exercise: false };
+
+  // Calculate Pip state
+  const dataForPip = dashboardData
+    ? {
+        ...dashboardData,
+        habits: {
+          ...dashboardData.habits,
+          todayCompleted: [habits.water, habits.nutrition, habits.exercise].filter(Boolean).length,
+        },
+      }
+    : null;
+
+  const basePipState = dataForPip
+    ? determinePipState(dataForPip)
+    : { state: "cheerful" as const, message: "Loading..." };
+
   const pipState = isCelebrating
     ? { state: "celebrating" as const, message: "All habits done today! You're absolutely crushing it!" }
     : basePipState;
@@ -82,38 +180,27 @@ export default function DashboardScreen() {
     day: "numeric",
   });
 
-  // Handle habit toggle (demo only)
-  const handleHabitPress = useCallback((habit: "water" | "nutrition" | "exercise") => {
-    setHabits(prev => {
-      const newHabits = {
-        ...prev,
-        [habit]: !prev[habit],
-      };
-
-      // Trigger celebration if this completes all habits
-      const wasAllComplete = prev.water && prev.nutrition && prev.exercise;
-      const willBeAllComplete = newHabits.water && newHabits.nutrition && newHabits.exercise;
-      if (willBeAllComplete && !wasAllComplete) {
-        triggerCelebration();
-      }
-
-      return newHabits;
-    });
-  }, [triggerCelebration]);
-
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#2C9C91"
+            colors={["#2C9C91"]}
+          />
+        }
       >
         {/* Header */}
         <View className="px-4 pt-4 pb-2">
           <View className="flex-row justify-between items-start">
             <View>
               <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-                Hey, {dashboardData.user.name}!
+                Hey, {dashboardData?.user.name || "there"}!
               </Text>
               <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {dateString}
@@ -139,40 +226,46 @@ export default function DashboardScreen() {
         {/* Cards Section */}
         <View className="px-4">
           {/* Week Badge */}
-          <View className="flex-row items-center mb-4">
-            <View className="bg-teal-500 px-3 py-1 rounded-full">
-              <Text className="text-white text-sm font-semibold">
-                Week {dashboardData.journey.weekNumber}
+          {dashboardData && (
+            <View className="flex-row items-center mb-4">
+              <View className="bg-teal-500 px-3 py-1 rounded-full">
+                <Text className="text-white text-sm font-semibold">
+                  Week {dashboardData.journey.weekNumber}
+                </Text>
+              </View>
+              <Text className="text-gray-500 dark:text-gray-400 text-sm ml-2">
+                of your journey
               </Text>
             </View>
-            <Text className="text-gray-500 dark:text-gray-400 text-sm ml-2">
-              of your journey
-            </Text>
-          </View>
+          )}
 
           {/* Next Dose Card */}
-          <NextDoseCard
-            daysUntil={injectionStatus.daysUntil}
-            injectionDay={getInjectionDayName(dashboardData.user.injectionDay)}
-            currentDose={injectionStatus.currentDose}
-            dosesRemaining={injectionStatus.dosesRemaining}
-            status={injectionStatus.status}
-          />
+          {injectionStatus && dashboardData && (
+            <NextDoseCard
+              daysUntil={injectionStatus.daysUntil}
+              injectionDay={getInjectionDayName(dashboardData.user.injectionDay)}
+              currentDose={injectionStatus.currentDose}
+              dosesRemaining={injectionStatus.dosesRemaining}
+              status={injectionStatus.status}
+            />
+          )}
 
           {/* Weight Progress Card */}
-          <WeightProgressCard
-            currentWeight={dashboardData.weight.currentWeight}
-            startWeight={dashboardData.user.startWeight}
-            goalWeight={dashboardData.user.goalWeight}
-            totalLost={dashboardData.weight.totalLost}
-            weekChange={dashboardData.weight.weekChange}
-            progressPercent={dashboardData.weight.progressPercent}
-            weightUnit={dashboardData.user.weightUnit}
-          />
+          {dashboardData && (
+            <WeightProgressCard
+              currentWeight={dashboardData.weight.currentWeight}
+              startWeight={dashboardData.user.startWeight}
+              goalWeight={dashboardData.user.goalWeight}
+              totalLost={dashboardData.weight.totalLost}
+              weekChange={dashboardData.weight.weekChange}
+              progressPercent={dashboardData.weight.progressPercent}
+              weightUnit={dashboardData.user.weightUnit}
+            />
+          )}
 
           {/* Habits Section */}
           <HabitsSection
-            streak={dashboardData.habits.streak || 0}
+            streak={dashboardData?.habits.streak || 0}
             habits={habits}
             onHabitPress={handleHabitPress}
           />

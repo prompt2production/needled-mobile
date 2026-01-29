@@ -4,12 +4,12 @@ import { Card, ProgressBar } from "@/components/ui";
 import { WeightUnit } from "@/types/api";
 
 export interface WeightProgressCardProps {
-  currentWeight: number;
+  currentWeight: number | null;
   startWeight: number;
   goalWeight: number | null;
-  totalLost: number;
+  totalLost: number | null;
   weekChange: number | null;
-  progressPercent: number;
+  progressPercent: number | null;
   weightUnit: WeightUnit;
 }
 
@@ -22,7 +22,11 @@ export function WeightProgressCard({
   progressPercent,
   weightUnit,
 }: WeightProgressCardProps) {
-  const formatWeight = (w: number) => `${w.toFixed(1)} ${weightUnit}`;
+  const formatWeight = (w: number | null) =>
+    w !== null ? `${w.toFixed(1)} ${weightUnit}` : `— ${weightUnit}`;
+
+  // Use start weight if no weigh-ins yet
+  const displayWeight = currentWeight ?? startWeight;
 
   const weekChangeText =
     weekChange !== null
@@ -41,10 +45,10 @@ export function WeightProgressCard({
       <View className="flex-row justify-between items-start mb-4">
         <View>
           <Text className="text-sm text-gray-500 dark:text-gray-400">
-            Current Weight
+            {currentWeight !== null ? "Current Weight" : "Starting Weight"}
           </Text>
           <Text className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
-            {formatWeight(currentWeight)}
+            {formatWeight(displayWeight)}
           </Text>
         </View>
         <View className="items-end">
@@ -64,11 +68,11 @@ export function WeightProgressCard({
               Progress to goal
             </Text>
             <Text className="text-sm font-medium text-teal-600 dark:text-teal-400">
-              {progressPercent.toFixed(0)}%
+              {progressPercent !== null ? `${progressPercent.toFixed(0)}%` : "0%"}
             </Text>
           </View>
           <ProgressBar
-            progress={progressPercent}
+            progress={progressPercent ?? 0}
             variant="teal"
             size="md"
             className="mb-3"
@@ -87,7 +91,7 @@ export function WeightProgressCard({
       <View className="flex-row mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
         <View className="flex-1 items-center">
           <Text className="text-2xl font-bold text-success">
-            {totalLost.toFixed(1)}
+            {totalLost !== null ? totalLost.toFixed(1) : "0.0"}
           </Text>
           <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {weightUnit} lost total

@@ -46,10 +46,10 @@ export function determinePipState(data: DashboardData): PipStateResult {
     };
   }
 
-  // Celebration triggers - all habits complete
+  // All habits complete - proud state (celebrating is reserved for temporary animation)
   if (data.habits.todayCompleted === data.habits.todayTotal) {
     return {
-      state: "celebrating",
+      state: "proud",
       message: "All habits done today! You're absolutely crushing it!",
     };
   }

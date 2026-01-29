@@ -1,6 +1,6 @@
 # Needled Mobile App - Implementation Progress
 
-## Status: In Progress
+## Status: Complete (All 8 Phases)
 
 ---
 
@@ -249,69 +249,103 @@ Build the Check-in tab for daily habit logging.
 ---
 
 ## Phase 5: Injection Tab
-- **Status:** Pending
+- **Status:** Completed
+- **Started:** 2026-01-27
+- **Completed:** 2026-01-27
 
 ### Task 10: Injection Logger Implementation
 
 Build the Injection tab for logging GLP-1 injections.
 
 **Checklist:**
-- [ ] Create injection screen layout (`app/(tabs)/injection.tsx`)
-- [ ] Add "Log Injection" form:
-  - Date picker (defaults to today)
-  - Injection site selector (6 sites with visual body diagram)
+- [x] Create injection screen layout (`app/(tabs)/injection.tsx`)
+- [x] Add "Log Injection" form:
+  - Injection site selector (2x3 grid for 6 sites)
   - Dose number display (auto-calculated from API)
   - Optional notes field
-- [ ] Show injection history list with pagination
-- [ ] Display site rotation recommendation
-- [ ] Show pen status (doses remaining: 1-4)
-- [ ] Create TanStack Query hooks for injection operations
-- [ ] Add success confirmation with Pip celebration
+  - Suggested site highlighting
+- [x] Show injection history list (expandable, last 5 injections)
+- [x] Display site rotation recommendation
+- [x] Show pen status (doses remaining: 1-4, progress bar)
+- [x] Create TanStack Query hooks for injection operations
+- [x] Add success confirmation with Pip celebration and confetti
+- [x] Two-state UI: Before (form) / After (success card)
+- [x] Dark mode support throughout
 
-**Files to create:**
-- `src/hooks/useInjections.ts`
-- `src/components/injection/InjectionForm.tsx`
-- `src/components/injection/SiteSelector.tsx`
-- `src/components/injection/InjectionHistory.tsx`
+**Files created:**
+- `src/hooks/useInjections.ts` - Query hooks with optimistic updates
+- `src/components/injection/SiteSelector.tsx` - 2x3 grid site selector
+- `src/components/injection/InjectionDetailsCard.tsx` - Pre-injection info card
+- `src/components/injection/InjectionSuccessCard.tsx` - Post-injection confirmation
+- `src/components/injection/InjectionHistory.tsx` - Expandable history list
+- `src/components/injection/index.ts` - Barrel exports
 
-**Files to modify:**
-- `app/(tabs)/injection.tsx`
+**Files modified:**
+- `app/(tabs)/injection.tsx` - Full screen implementation
+- `src/hooks/index.ts` - Added injection hook exports
 
-**API endpoints:**
+**Features:**
+- Status-based UI (due, done, overdue, upcoming)
+- Pip mascot with contextual messages for each status
+- Haptic feedback on site selection and form submission
+- Optimistic updates for instant feedback
+- Pull-to-refresh functionality
+- Dose progress visualization (X of 4 per pen)
+- Confetti celebration on successful log
+
+**API endpoints used:**
 - `POST /api/injections` - Log new injection
 - `GET /api/injections` - Get history
-- `GET /api/injections/status` - Get status (already used in dashboard)
+- `GET /api/injections/status` - Get status with recommendations
 
 ---
 
 ## Phase 6: Weigh-in Tab
-- **Status:** Pending
+- **Status:** Completed
+- **Started:** 2026-01-27
+- **Completed:** 2026-01-27
 
 ### Task 11: Weigh-in Implementation
 
 Build the Weigh-in tab for weight tracking.
 
 **Checklist:**
-- [ ] Create weigh-in screen layout (`app/(tabs)/weigh-in.tsx`)
-- [ ] Add "Log Weight" form:
+- [x] Create weigh-in screen layout (`app/(tabs)/weigh-in.tsx`)
+- [x] Add "Log Weight" form:
   - Weight input with unit from user profile (kg/lbs)
-  - Date picker (defaults to today)
-  - Optional notes
-- [ ] Show weight history list
-- [ ] Display progress stats (total lost, weekly change, goal progress)
-- [ ] Add simple weight trend visualization
-- [ ] Create TanStack Query hooks for weigh-in operations
-- [ ] Handle "already weighed in this week" scenario
+  - Input validation (min/max based on unit)
+  - Last weight shown as placeholder hint
+- [x] Show weight history list (expandable, last 10 entries)
+- [x] Display progress stats (total lost, weekly change, goal progress)
+- [x] Add goal progress visualization with progress bar
+- [x] Create TanStack Query hooks for weigh-in operations
+- [x] Handle "already weighed in this week" scenario (two-state UI)
+- [x] Add success confirmation with Pip celebration and confetti
+- [x] Dark mode support throughout
 
-**Files to create:**
-- `src/hooks/useWeighIns.ts`
-- `src/components/weighin/WeighInForm.tsx`
-- `src/components/weighin/WeightHistory.tsx`
+**Files created:**
+- `src/hooks/useWeighIns.ts` - Query hooks with optimistic updates
+- `src/components/weighin/WeighInForm.tsx` - Weight input with validation
+- `src/components/weighin/WeighInSuccessCard.tsx` - Post weigh-in confirmation
+- `src/components/weighin/WeightStatsCard.tsx` - Current weight and stats display
+- `src/components/weighin/WeighInHistory.tsx` - Expandable history list
+- `src/components/weighin/index.ts` - Barrel exports
 
-**Files to modify:**
-- `app/(tabs)/weigh-in.tsx`
+**Files modified:**
+- `app/(tabs)/weigh-in.tsx` - Full screen implementation
+- `src/hooks/index.ts` - Added weigh-in hook exports
 
-**API endpoints:**
+**Features:**
+- Two-state UI: Form state (ready to weigh) / Success state (weighed this week)
+- Pip mascot with contextual messages based on weight change
+- Color-coded change indicators (green for loss, yellow for gain)
+- Goal progress bar with percentage and remaining weight
+- Haptic feedback on form submission
+- Optimistic updates for instant feedback
+- Pull-to-refresh functionality
+- Confetti celebration on successful log
+
+**API endpoints used:**
 - `POST /api/weigh-ins` - Log new weigh-in
 - `GET /api/weigh-ins` - Get history
 - `GET /api/weigh-ins/latest` - Get latest with stats
@@ -319,71 +353,112 @@ Build the Weigh-in tab for weight tracking.
 ---
 
 ## Phase 7: Calendar Tab
-- **Status:** Pending
+- **Status:** Completed
+- **Started:** 2026-01-27
+- **Completed:** 2026-01-27
 
 ### Task 12: Calendar View Implementation
 
 Build the Calendar tab for monthly activity overview.
 
 **Checklist:**
-- [ ] Create calendar screen layout (`app/(tabs)/calendar.tsx`)
-- [ ] Build monthly calendar grid component
-- [ ] Add activity indicators (dots/icons for habits, injections, weigh-ins)
-- [ ] Implement month navigation (prev/next)
-- [ ] Create day detail modal/sheet showing all activities
-- [ ] Create TanStack Query hooks for calendar data
-- [ ] Handle loading states for month transitions
+- [x] Create calendar screen layout (`app/(tabs)/calendar.tsx`)
+- [x] Build monthly calendar grid component
+- [x] Add activity indicators (dots for habits, injections, weigh-ins)
+- [x] Implement month navigation (prev/next, go to today)
+- [x] Create day detail modal/sheet showing all activities
+- [x] Create TanStack Query hooks for calendar data
+- [x] Handle loading states for month transitions
+- [x] Monthly summary stats (perfect days, injections, weigh-ins)
+- [x] Color-coded legend for activity types
+- [x] Dark mode support throughout
 
-**Files to create:**
-- `src/hooks/useCalendar.ts`
-- `src/components/calendar/MonthGrid.tsx`
-- `src/components/calendar/DayCell.tsx`
-- `src/components/calendar/DayDetailSheet.tsx`
+**Files created:**
+- `src/hooks/useCalendar.ts` - Query hooks with helper functions
+- `src/components/calendar/MonthGrid.tsx` - Monthly grid with activity indicators
+- `src/components/calendar/DayCell.tsx` - Individual day cell component
+- `src/components/calendar/DayDetailSheet.tsx` - Bottom sheet for day details
+- `src/components/calendar/index.ts` - Barrel exports
 
-**Files to modify:**
-- `app/(tabs)/calendar.tsx`
+**Files modified:**
+- `app/(tabs)/calendar.tsx` - Full screen implementation
+- `src/hooks/index.ts` - Added calendar hook exports
 
-**API endpoints:**
+**Features:**
+- Month navigation with prev/next arrows
+- "Go to today" tap on month header
+- Cannot navigate to future months
+- Activity dots: teal (habits), pink (injection), yellow (weigh-in)
+- Highlighted background for perfect habit days
+- Today indicator with teal border
+- Selected day indicator with teal fill
+- Day detail modal with all activities
+- Monthly summary cards showing counts
+- Pull-to-refresh functionality
+- Haptic feedback on interactions
+
+**API endpoints used:**
 - `GET /api/calendar/{year}/{month}` - Monthly data
 - `GET /api/calendar/day/{date}` - Daily details
 
 ---
 
 ## Phase 8: Settings & Polish
-- **Status:** Pending
+- **Status:** Completed
+- **Started:** 2026-01-27
+- **Completed:** 2026-01-27
 
 ### Task 13: Settings Screens
 
 Build complete settings functionality.
 
 **Checklist:**
-- [ ] Create profile edit screen (`app/settings/profile.tsx`)
+- [x] Create profile edit screen (`app/settings/profile.tsx`)
   - Edit name, goal weight, medication, injection day
-- [ ] Create password change screen (`app/settings/password.tsx`)
-- [ ] Create email change screen (`app/settings/email.tsx`)
-- [ ] Create notification preferences screen (`app/settings/notifications.tsx`)
-- [ ] Add data export functionality
-- [ ] Add account deletion with confirmation
-- [ ] Update settings index to link to all screens
+- [x] Create password change screen (`app/settings/password.tsx`)
+  - Current password, new password with strength indicator
+  - Password requirements info
+- [x] Create notification preferences screen (`app/settings/preferences.tsx`)
+  - Toggle reminders: injection, weigh-in, daily habits
+  - Display reminder times and timezone
+- [x] Create account management screen (`app/settings/account.tsx`)
+  - Email change with verification
+  - Data export (JSON format via Share API)
+  - Account deletion with password confirmation
+- [x] Update settings index with working navigation to all screens
 
-**Files to create:**
-- `app/settings/profile.tsx`
-- `app/settings/password.tsx`
-- `app/settings/email.tsx`
-- `app/settings/notifications.tsx`
-- `src/hooks/useSettings.ts`
+**Files created:**
+- `app/settings/profile.tsx` - Profile editing (name, goal weight, medication, injection day)
+- `app/settings/password.tsx` - Password change with strength indicator
+- `app/settings/account.tsx` - Email change, data export, account deletion
+- `src/hooks/useSettings.ts` - TanStack Query hooks for all settings operations
 
-**Files to modify:**
-- `app/settings/index.tsx`
+**Files modified:**
+- `app/settings/index.tsx` - Updated with proper navigation menu
+- `app/settings/preferences.tsx` - Replaced placeholder with full notification preferences
+- `src/stores/authStore.ts` - Added `updateUser` action
+- `src/hooks/index.ts` - Added settings hook exports
 
-**API endpoints:**
-- `GET /api/settings`
-- `PUT /api/settings/profile`
-- `PUT /api/settings/password`
-- `PUT /api/settings/email`
-- `GET /api/settings/export`
-- `DELETE /api/settings/account`
-- `GET/PUT /api/notifications/preferences`
+**Features:**
+- Profile editing with medication and injection day selection lists
+- Password strength indicator (4-bar visual with Weak/Fair/Good/Strong labels)
+- Notification preference toggles with instant save
+- Email change with verification flow
+- Data export via native Share API
+- Account deletion with password confirmation and danger zone styling
+- Consistent header navigation across all settings screens
+- Dark mode support throughout
+- Haptic feedback on interactions
+
+**API endpoints used:**
+- `GET /api/settings` - Fetch profile settings
+- `PUT /api/settings/profile` - Update profile
+- `PUT /api/settings/password` - Change password
+- `PUT /api/settings/email` - Change email (triggers verification)
+- `GET /api/settings/export` - Export user data
+- `DELETE /api/settings/account` - Delete account
+- `GET /api/notifications/preferences` - Fetch notification prefs
+- `PUT /api/notifications/preferences` - Update notification prefs
 
 ---
 
@@ -404,6 +479,10 @@ Build complete settings functionality.
 | 2026-01-27 | Add form validation and UX improvements | src/lib/validation.ts, app/(auth)/login.tsx, app/(auth)/register.tsx |
 | 2026-01-27 | Add post-registration onboarding flow | app/(auth)/onboarding.tsx, src/stores/authStore.ts, app/_layout.tsx |
 | 2026-01-27 | Implement check-in tab with date navigation | app/(tabs)/check-in.tsx, src/hooks/useCheckIn.ts, src/hooks/index.ts |
+| 2026-01-27 | Implement injection tab with site selector and celebration | app/(tabs)/injection.tsx, src/hooks/useInjections.ts, src/components/injection/* |
+| 2026-01-27 | Implement weigh-in tab with weight tracking and stats | app/(tabs)/weigh-in.tsx, src/hooks/useWeighIns.ts, src/components/weighin/* |
+| 2026-01-27 | Implement calendar tab with monthly view and day details | app/(tabs)/calendar.tsx, src/hooks/useCalendar.ts, src/components/calendar/* |
+| 2026-01-27 | Implement settings screens with profile, password, notifications, account | app/settings/*, src/hooks/useSettings.ts, src/stores/authStore.ts |
 
 ---
 

@@ -23,7 +23,8 @@
         "backgroundColor": "#14B8A6"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.needled.app"
+      "package": "com.needled.app",
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png",

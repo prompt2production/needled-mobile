@@ -155,11 +155,11 @@ export interface DashboardData {
     createdAt: string;
   };
   weight: {
-    currentWeight: number;
+    currentWeight: number | null;
     previousWeight: number | null;
     weekChange: number | null;
-    totalLost: number;
-    progressPercent: number;
+    totalLost: number | null;
+    progressPercent: number | null;
     weighInCount: number;
     canWeighIn: boolean;
   };

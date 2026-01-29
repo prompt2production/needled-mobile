@@ -21,23 +21,39 @@ Needled is a weight loss journey companion app for people using GLP-1 medication
 
 ## Authentication
 
-### Current Implementation (Web)
+The API supports **dual authentication** for both web and native app clients:
 
-The web app uses HTTP-only session cookies. After login, a `needled_session` cookie is set automatically.
+### Web App (Cookie Auth)
 
-### Native App Authentication
+The web app uses HTTP-only session cookies. After login, a `needled_session` cookie is set automatically. No additional action is required for web clients.
 
-For native apps, you should:
+### Native App (Bearer Token Auth)
 
-1. **Login/Register**: Call the auth endpoints and extract the session token from the response
-2. **Store token**: Securely store the token in the device keychain/keystore
+For native apps (iOS/Android):
+
+1. **Login**: Call `POST /api/auth/login` and extract the `token` field from the response:
+```json
+{
+  "id": "cuid",
+  "name": "John Doe",
+  "email": "john@example.com",
+  ...
+  "token": "64-character-hex-string"
+}
+```
+
+2. **Store token**: Securely store the token in the device keychain/keystore:
+   - **iOS**: Keychain Services
+   - **Android**: EncryptedSharedPreferences or Android Keystore
+
 3. **Send token**: Include the token in the `Authorization` header for all authenticated requests:
-
 ```
-Authorization: Bearer <session_token>
+Authorization: Bearer <token>
 ```
 
-> **Note for API Team**: The current implementation uses cookies. You may need to modify the auth endpoints to return the token in the response body and accept `Authorization: Bearer` headers as an alternative to cookies.
+### Auth Priority
+
+When both Bearer token and cookie are present, the API prioritizes Bearer token authentication. This allows native apps to work correctly even if cookies are present.
 
 ### Session Details
 
@@ -211,7 +227,8 @@ Authenticate an existing user.
   "medication": "OZEMPIC",
   "injectionDay": 2,
   "createdAt": "2024-01-15T10:30:00.000Z",
-  "updatedAt": "2024-01-15T10:30:00.000Z"
+  "updatedAt": "2024-01-15T10:30:00.000Z",
+  "token": "64-character-hex-session-token"
 }
 ```
 
@@ -219,7 +236,9 @@ Authenticate an existing user.
 - `400` - Validation error
 - `401` - Invalid credentials
 
-> **Native App Note**: The session token is currently set via cookie. For native apps, you'll need the token returned in the response body.
+**Notes:**
+- Web clients: A `needled_session` cookie is also set automatically
+- Native clients: Extract and securely store the `token` field for subsequent API calls
 
 ---
 
@@ -981,19 +1000,18 @@ Update notification preferences.
 
 ## Implementation Notes for Native Apps
 
-### 1. Authentication Modifications
+### 1. Authentication
 
-The current API uses HTTP-only cookies for session management. For native apps, consider:
+The API supports Bearer token authentication for native apps. The login endpoint returns the session token:
 
-**Option A: Modify login endpoint** to return the session token:
 ```json
 {
-  "user": { ... },
-  "sessionToken": "abc123..."
+  "id": "cuid",
+  "name": "John Doe",
+  ...
+  "token": "64-character-hex-session-token"
 }
 ```
-
-**Option B: Add a token endpoint** (`POST /api/auth/token`) that exchanges credentials for a bearer token.
 
 ### 2. Token Storage
 

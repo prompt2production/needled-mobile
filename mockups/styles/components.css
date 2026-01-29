@@ -272,7 +272,7 @@
   color: var(--gray-900);
 }
 
-/* Calendar Grid */
+/* Calendar Grid - Journey Map */
 .calendar {
   background: var(--white);
 }
@@ -326,9 +326,252 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  position: relative;
 }
 
+/* Journey Day Component */
+.journey-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+  min-height: 44px;
+}
+
+.journey-day:hover {
+  transform: scale(1.05);
+}
+
+.journey-day:active {
+  transform: scale(0.95);
+}
+
+/* Heat map backgrounds based on completion */
+.journey-day--empty {
+  background: var(--gray-50);
+  cursor: default;
+}
+
+.journey-day--empty:hover {
+  transform: none;
+}
+
+.journey-day--future {
+  background: var(--white);
+  color: var(--gray-400);
+}
+
+.journey-day--0 {
+  background: var(--gray-50);
+}
+
+.journey-day--33 {
+  background: var(--teal-50);
+}
+
+.journey-day--66 {
+  background: var(--teal-100);
+}
+
+.journey-day--100 {
+  background: linear-gradient(135deg, var(--teal-200), var(--teal-300));
+  box-shadow: 0 0 8px rgba(45, 212, 191, 0.3);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Today styling */
+.journey-day--today {
+  font-weight: var(--font-weight-bold);
+  position: relative;
+}
+
+.journey-day--today::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--teal-500);
+  border-radius: var(--radius-lg);
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+/* Streak day styling */
+.journey-day--streak {
+  position: relative;
+}
+
+.journey-day--streak::after {
+  content: '🔥';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 10px;
+  animation: flame-twinkle 1.5s ease-in-out infinite;
+}
+
+/* Day number */
+.journey-day__number {
+  position: relative;
+  z-index: 2;
+  font-size: var(--font-size-sm);
+  line-height: 1;
+}
+
+/* Progress ring container */
+.journey-day__ring {
+  position: absolute;
+  inset: 2px;
+  pointer-events: none;
+}
+
+.journey-day__ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.journey-day__ring-bg {
+  fill: none;
+  stroke: var(--gray-200);
+  stroke-width: 2;
+}
+
+.journey-day__ring-fill {
+  fill: none;
+  stroke: var(--teal-400);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.5s ease-out;
+}
+
+/* Emoji badges */
+.journey-day__badges {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+}
+
+.journey-day__badge {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.journey-day__badge--injection {
+  background: var(--coral-light);
+}
+
+.journey-day__badge--weighin {
+  background: var(--yellow-light);
+}
+
+/* Milestone markers */
+.journey-day--milestone-7 {
+  position: relative;
+}
+
+.journey-day--milestone-7::before {
+  content: '⭐';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  animation: twinkle 1.5s ease-in-out infinite;
+}
+
+.journey-day--milestone-7 {
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+}
+
+.journey-day--milestone-14 {
+  position: relative;
+}
+
+.journey-day--milestone-14::after {
+  content: '🔥';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  animation: flame-twinkle 1s ease-in-out infinite;
+}
+
+.journey-day--milestone-14 {
+  box-shadow: 0 0 16px rgba(251, 146, 60, 0.5);
+}
+
+.journey-day--milestone-30 {
+  position: relative;
+  background: linear-gradient(135deg, #fef3c7, #d4f4dd, #ccfbf1);
+}
+
+.journey-day--milestone-30::before {
+  content: '🏆';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+.journey-day--milestone-30 {
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.6), 0 0 40px rgba(251, 191, 36, 0.3);
+}
+
+/* Streak connectors */
+.journey-day--streak-start {
+  position: relative;
+}
+
+.journey-day--streak-continue {
+  position: relative;
+}
+
+.journey-day--streak-continue::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  width: 8px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--yellow), var(--teal-400));
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+/* Streak connector for row wrap */
+.journey-day--streak-row-end::after {
+  content: '';
+  position: absolute;
+  right: -100%;
+  top: 50%;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--teal-400), transparent);
+  border-radius: 2px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Legacy calendar support */
 .calendar__day {
   aspect-ratio: 1;
   display: flex;
@@ -384,7 +627,244 @@
   background: var(--yellow);
 }
 
-/* Legend */
+/* Journey Header Enhancement */
+.journey-header {
+  background: linear-gradient(135deg, var(--teal-50), var(--teal-100));
+  padding: var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.journey-header__content {
+  flex: 1;
+}
+
+.journey-header__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+}
+
+.journey-header__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+  margin-bottom: var(--space-3);
+}
+
+.journey-header__streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(135deg, var(--yellow-light), #fef9c3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--gray-800);
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
+.journey-header__streak-badge span:first-child {
+  font-size: var(--font-size-lg);
+}
+
+/* Pip speech bubble */
+.pip-container {
+  position: relative;
+}
+
+.pip-speech-bubble {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: var(--white);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-xs);
+  color: var(--gray-700);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  margin-bottom: var(--space-2);
+  animation: fade-in 0.3s ease-out;
+}
+
+.pip-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 20px;
+  width: 12px;
+  height: 12px;
+  background: var(--white);
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Monthly Wins Stats Section */
+.monthly-wins {
+  padding: var(--space-4);
+}
+
+.monthly-wins__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.monthly-wins__title span {
+  font-size: var(--font-size-base);
+}
+
+/* Hero stat with progress ring */
+.hero-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--teal-50), var(--white));
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-3);
+}
+
+.hero-stat__ring {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.hero-stat__ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.hero-stat__ring-bg {
+  fill: none;
+  stroke: var(--gray-200);
+  stroke-width: 6;
+}
+
+.hero-stat__ring-fill {
+  fill: none;
+  stroke: var(--teal-500);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+.hero-stat__value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--gray-900);
+}
+
+.hero-stat__content {
+  flex: 1;
+}
+
+.hero-stat__label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+}
+
+.hero-stat__comparison {
+  font-size: var(--font-size-sm);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Stat cards grid */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.stat-card {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat-card--coral {
+  background: linear-gradient(135deg, var(--coral-light), #fff1f2);
+}
+
+.stat-card--yellow {
+  background: linear-gradient(135deg, var(--yellow-light), #fefce8);
+}
+
+.stat-card--teal {
+  background: linear-gradient(135deg, var(--teal-100), var(--teal-50));
+}
+
+.stat-card--green {
+  background: linear-gradient(135deg, var(--success-light), #f0fdf4);
+}
+
+.stat-card__icon {
+  font-size: var(--font-size-lg);
+}
+
+.stat-card__value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--gray-900);
+}
+
+.stat-card__label {
+  font-size: var(--font-size-xs);
+  color: var(--gray-600);
+}
+
+/* Share button */
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  margin-top: var(--space-4);
+  background: var(--gray-100);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.share-btn:hover {
+  background: var(--gray-200);
+}
+
+.share-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Legend - Updated */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -406,6 +886,16 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
+}
+
+.legend__badge {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
 }
 
 /* Greeting */
