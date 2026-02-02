@@ -4,6 +4,7 @@
  */
 
 export { SiteSelector } from './SiteSelector';
+export { DosageSelector } from './DosageSelector';
 export { InjectionDetailsCard } from './InjectionDetailsCard';
 export { InjectionSuccessCard } from './InjectionSuccessCard';
 export { InjectionHistory } from './InjectionHistory';

@@ -25,10 +25,13 @@ import {
 import { PipWithBubble, PipState } from '@/components/pip';
 import {
   SiteSelector,
+  DosageSelector,
   InjectionDetailsCard,
   InjectionSuccessCard,
   InjectionHistory,
 } from '@/components/injection';
+import { hasDosageTracking } from '@/constants/dosages';
+import { DatePicker } from '@/components/ui';
 import { InjectionSite, InjectionStatus } from '@/types/api';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -55,10 +58,13 @@ export default function InjectionScreen() {
 
   // Form state
   const [selectedSite, setSelectedSite] = useState<InjectionSite | null>(null);
+  const [selectedDosage, setSelectedDosage] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // Celebration state
   const [isCelebrating, setIsCelebrating] = useState(false);
+  const [showAddEntryForm, setShowAddEntryForm] = useState(false);
   const confettiRef = useRef<any>(null);
   const celebrationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -79,6 +85,13 @@ export default function InjectionScreen() {
       setSelectedSite(injectionStatus.suggestedSite);
     }
   }, [injectionStatus?.suggestedSite, selectedSite]);
+
+  // Set default dosage from current user dosage
+  useEffect(() => {
+    if (injectionStatus?.currentDosageMg && selectedDosage === null) {
+      setSelectedDosage(injectionStatus.currentDosageMg);
+    }
+  }, [injectionStatus?.currentDosageMg, selectedDosage]);
 
   // Trigger celebration
   const triggerCelebration = useCallback(() => {
@@ -103,6 +116,14 @@ export default function InjectionScreen() {
     };
   }, []);
 
+  // Format date to YYYY-MM-DD string
+  const formatDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Handle marking as done
   const handleMarkAsDone = useCallback(() => {
     if (!selectedSite || logInjectionMutation.isPending) return;
@@ -110,24 +131,48 @@ export default function InjectionScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     triggerCelebration();
 
+    // Format date if a historical date is selected
+    const dateString = selectedDate ? formatDateString(selectedDate) : undefined;
+
     logInjectionMutation.mutate(
       {
         site: selectedSite,
         notes: notes.trim() || undefined,
+        date: dateString,
+        dosageMg: selectedDosage ?? undefined,
       },
       {
         onSuccess: () => {
           // Reset form
           setNotes('');
-          // Don't reset selectedSite here - let the next API response set the new suggested site
+          setSelectedDate(null);
+          setShowAddEntryForm(false); // Return to success state after logging
+          // Don't reset selectedSite or selectedDosage here - let the next API response set new values
         },
       }
     );
-  }, [selectedSite, notes, logInjectionMutation, triggerCelebration]);
+  }, [selectedSite, selectedDosage, notes, selectedDate, logInjectionMutation, triggerCelebration]);
+
+  // Handle showing the add entry form
+  const handleAddEntry = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowAddEntryForm(true);
+    // Reset form state for new entry
+    setSelectedSite(injectionStatus?.suggestedSite || null);
+    setSelectedDosage(injectionStatus?.currentDosageMg || null);
+    setNotes('');
+    setSelectedDate(null);
+  }, [injectionStatus?.suggestedSite, injectionStatus?.currentDosageMg]);
+
+  // Handle canceling add entry
+  const handleCancelAddEntry = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowAddEntryForm(false);
+  }, []);
 
   // Determine status
   const status: InjectionStatus = injectionStatus?.status || 'upcoming';
-  const isDone = status === 'done';
+  const isDone = status === 'done' && !showAddEntryForm;
   const isDue = status === 'due';
   const isOverdue = status === 'overdue';
 
@@ -323,6 +368,35 @@ export default function InjectionScreen() {
                   />
                 )}
 
+                {/* Add Entry Button */}
+                <Pressable
+                  onPress={handleAddEntry}
+                  style={{
+                    backgroundColor: isDark ? '#1E1E2E' : '#FFFFFF',
+                    borderRadius: 16,
+                    paddingVertical: 16,
+                    paddingHorizontal: 20,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    borderWidth: 2,
+                    borderColor: '#14B8A6',
+                    borderStyle: 'dashed',
+                  }}
+                >
+                  <Text style={{ fontSize: 20 }}>+</Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: '#14B8A6',
+                    }}
+                  >
+                    Add Injection Entry
+                  </Text>
+                </Pressable>
+
                 <InjectionHistory
                   injections={injectionHistory}
                   isLoading={historyLoading}
@@ -339,11 +413,38 @@ export default function InjectionScreen() {
                   />
                 )}
 
+                {/* Date Picker for historical entries */}
+                <View
+                  style={{
+                    backgroundColor: isDark ? '#1E1E2E' : '#FFFFFF',
+                    borderRadius: 20,
+                    padding: 16,
+                  }}
+                >
+                  <DatePicker
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                    disabled={logInjectionMutation.isPending}
+                    label="Injection Date"
+                  />
+                </View>
+
                 {injectionStatus && (
                   <SiteSelector
                     selectedSite={selectedSite}
                     suggestedSite={injectionStatus.suggestedSite}
                     onSelect={setSelectedSite}
+                    disabled={logInjectionMutation.isPending}
+                  />
+                )}
+
+                {/* Dosage Selector - only shown for medications with dosage tracking */}
+                {hasDosageTracking(medication) && (
+                  <DosageSelector
+                    medication={medication}
+                    currentDosage={injectionStatus?.currentDosageMg || null}
+                    selectedDosage={selectedDosage}
+                    onDosageChange={setSelectedDosage}
                     disabled={logInjectionMutation.isPending}
                   />
                 )}
@@ -418,10 +519,33 @@ export default function InjectionScreen() {
                             : '#FFFFFF',
                       }}
                     >
-                      Mark as Done
+                      {showAddEntryForm ? 'Log Injection' : 'Mark as Done'}
                     </Text>
                   )}
                 </Pressable>
+
+                {/* Cancel Button (only when adding entry) */}
+                {showAddEntryForm && (
+                  <Pressable
+                    onPress={handleCancelAddEntry}
+                    disabled={logInjectionMutation.isPending}
+                    style={{
+                      paddingVertical: 14,
+                      alignItems: 'center',
+                      opacity: logInjectionMutation.isPending ? 0.5 : 1,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '600',
+                        color: isDark ? '#9CA3AF' : '#6B7280',
+                      }}
+                    >
+                      Cancel
+                    </Text>
+                  </Pressable>
+                )}
 
                 {/* History collapsed by default in before state */}
                 <InjectionHistory

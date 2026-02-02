@@ -8,6 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import { User, RegisterRequest } from '../types/api';
 import * as authApi from '../services/auth';
 import { AUTH_TOKEN_KEY, setOnUnauthorized, clearToken } from '../services/api';
+import { unregisterPushToken, cancelAllScheduledNotifications } from '../services/notifications';
 
 interface AuthState {
   user: User | null;
@@ -86,6 +87,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
     logout: async () => {
       set({ isLoading: true });
       try {
+        // Unregister push token and cancel local notifications (best effort)
+        try {
+          await Promise.all([
+            unregisterPushToken(),
+            cancelAllScheduledNotifications(),
+          ]);
+        } catch (e) {
+          console.warn('Failed to cleanup notifications:', e);
+        }
+
         // Call logout API (best effort - don't fail if network error)
         try {
           await authApi.logout();

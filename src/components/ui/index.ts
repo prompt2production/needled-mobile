@@ -22,3 +22,15 @@ export {
   Label,
 } from './Text';
 export type { TextProps } from './Text';
+
+export { ChipSelector } from './ChipSelector';
+export type { ChipSelectorProps, ChipOption } from './ChipSelector';
+
+export { InputLight } from './InputLight';
+export type { InputLightProps } from './InputLight';
+
+export { DatePicker } from './DatePicker';
+export type { DatePickerProps } from './DatePicker';
+
+export { FloatingActionButton } from './FloatingActionButton';
+export type { FloatingActionButtonProps, FABAction } from './FloatingActionButton';

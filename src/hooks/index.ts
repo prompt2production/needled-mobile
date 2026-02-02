@@ -44,6 +44,11 @@ export {
 } from './useWeighIns';
 
 export {
+  useWeightProgress,
+  weightProgressKeys,
+} from './useWeightProgress';
+
+export {
   useCalendarMonth,
   useCalendarDay,
   calendarKeys,
@@ -78,3 +83,11 @@ export type {
   StreakData,
   JourneyData,
 } from './useJourneyData';
+
+export {
+  useNotificationsSetup,
+  useUpdateNotificationSchedule,
+  useUnregisterPushToken,
+  useCancelAllNotifications,
+  notificationKeys,
+} from './useNotifications';

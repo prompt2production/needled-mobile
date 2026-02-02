@@ -8,6 +8,7 @@ import { useAuthStore } from '../stores/authStore';
 import * as weighInsService from '../services/weighins';
 import { WeighIn, WeighInLatest } from '../types/api';
 import { dashboardKeys } from './useDashboard';
+import { weightProgressKeys } from './useWeightProgress';
 
 // Query keys
 export const weighInKeys = {
@@ -125,6 +126,8 @@ export function useLogWeighIn() {
       queryClient.invalidateQueries({ queryKey: weighInKeys.history(userId || '') });
       // Also invalidate dashboard to update weight card
       queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+      // Invalidate weight progress chart data
+      queryClient.invalidateQueries({ queryKey: weightProgressKeys.all });
     },
 
     // Rollback on error

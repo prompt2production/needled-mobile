@@ -33,9 +33,12 @@ export interface User {
   email: string;
   startWeight: number;
   goalWeight: number | null;
+  goalDate: string | null; // ISO date string - target date to reach goal weight
   weightUnit: WeightUnit;
   medication: Medication;
   injectionDay: InjectionDay;
+  currentDosage: number | null; // Current medication dosage in mg
+  height: number | null; // Height in cm (for BMI calculation)
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +58,8 @@ export interface RegisterRequest {
   weightUnit: WeightUnit;
   medication: Medication;
   injectionDay: InjectionDay;
+  startingDosage?: number; // Starting medication dosage in mg
+  height?: number; // Height in cm
 }
 
 export interface AuthResponse {
@@ -93,6 +98,7 @@ export interface Injection {
   date: string;
   site: InjectionSite;
   doseNumber: DoseNumber;
+  dosageMg: number | null; // Medication dosage at time of injection
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -106,6 +112,7 @@ export interface InjectionStatusResponse {
     id: string;
     site: InjectionSite;
     doseNumber: DoseNumber;
+    dosageMg: number | null;
     date: string;
     notes: string | null;
   } | null;
@@ -113,12 +120,14 @@ export interface InjectionStatusResponse {
   currentDose: DoseNumber | null;
   nextDose: DoseNumber;
   dosesRemaining: number;
+  currentDosageMg: number | null; // User's current dosage in mg
 }
 
 export interface CreateInjectionRequest {
   userId: string;
   site: InjectionSite;
   doseNumber?: DoseNumber;
+  dosageMg?: number; // Medication dosage in mg
   notes?: string;
   date?: string;
 }
@@ -149,6 +158,7 @@ export interface DashboardData {
     name: string;
     startWeight: number;
     goalWeight: number | null;
+    goalDate: string | null; // ISO date string - target date to reach goal weight
     weightUnit: WeightUnit;
     medication: Medication;
     injectionDay: InjectionDay;
@@ -239,6 +249,7 @@ export interface ProfileSettings {
   name: string;
   email: string;
   goalWeight: number | null;
+  goalDate: string | null; // ISO date string - target date to reach goal weight
   weightUnit: WeightUnit;
   medication: Medication;
   injectionDay: InjectionDay;
@@ -247,6 +258,35 @@ export interface ProfileSettings {
 export interface UpdateProfileRequest {
   name: string;
   goalWeight?: number | null;
+  goalDate?: string | null; // ISO date string - target date to reach goal weight
   medication: Medication;
   injectionDay: InjectionDay;
+  currentDosage?: number | null;
+  height?: number | null;
+}
+
+// Weight Progress Chart
+export type ChartTimeRange = '1M' | '3M' | '6M' | 'ALL';
+
+export interface WeightProgressData {
+  weighIns: Array<{
+    date: string;
+    weight: number;
+    dosageMg: number | null;
+  }>;
+  dosageChanges: Array<{
+    date: string;
+    fromDosage: number | null;
+    toDosage: number;
+  }>;
+  stats: WeightProgressStats;
+}
+
+export interface WeightProgressStats {
+  totalChange: number;
+  percentChange: number;
+  currentBmi: number | null;
+  goalProgress: number | null;
+  toGoal: number | null;
+  weeklyAverage: number | null;
 }

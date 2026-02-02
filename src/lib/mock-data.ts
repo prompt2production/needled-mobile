@@ -7,6 +7,7 @@ export const mockDashboardData: DashboardData = {
     name: "Sarah",
     startWeight: 95,
     goalWeight: 75,
+    goalDate: "2026-06-15", // Target date to reach goal weight
     weightUnit: "kg",
     medication: "OZEMPIC",
     injectionDay: 2, // Wednesday
@@ -41,6 +42,7 @@ export const mockInjectionStatus: InjectionStatusResponse = {
     id: "inj-123",
     site: "ABDOMEN_LEFT",
     doseNumber: 2,
+    dosageMg: 0.5,
     date: "2024-01-17T12:00:00.000Z",
     notes: null,
   },
@@ -48,6 +50,7 @@ export const mockInjectionStatus: InjectionStatusResponse = {
   currentDose: 2,
   nextDose: 3,
   dosesRemaining: 2,
+  currentDosageMg: 0.5,
 };
 
 // Mock today's habits (2 of 3 complete - tap Exercise to trigger confetti!)

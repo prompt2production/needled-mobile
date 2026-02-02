@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import * as settingsService from '../services/settings';
+import { updateNotificationSchedule } from '../services/notifications';
 import {
   ProfileSettings,
   UpdateProfileRequest,
@@ -36,26 +37,42 @@ export function useProfileSettings() {
 
 /**
  * Update profile settings mutation
+ * Also updates notification schedules if injection day changes
  */
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
-  const { updateUser } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: UpdateProfileRequest) => settingsService.updateProfile(data),
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Update the settings cache
       queryClient.setQueryData(settingsKeys.profile(), data);
       // Update the auth store user
       updateUser({
         name: data.name,
         goalWeight: data.goalWeight,
+        goalDate: data.goalDate,
         medication: data.medication,
         injectionDay: data.injectionDay,
       });
       // Invalidate dashboard to reflect changes
       queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+
+      // If injection day changed, update notification schedules
+      if (user && data.injectionDay !== user.injectionDay) {
+        const preferences = queryClient.getQueryData<NotificationPreferences>(
+          settingsKeys.notifications()
+        );
+        if (preferences) {
+          try {
+            await updateNotificationSchedule(preferences, data.injectionDay);
+          } catch (error) {
+            console.warn('Failed to update notification schedule:', error);
+          }
+        }
+      }
     },
   });
 }
@@ -132,17 +149,28 @@ export function useNotificationPreferences() {
 
 /**
  * Update notification preferences mutation
+ * Also updates local notification schedules
  */
 export function useUpdateNotificationPreferences() {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   return useMutation({
     mutationFn: (
       data: Omit<NotificationPreferences, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
     ) => settingsService.updateNotificationPreferences(data),
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.setQueryData(settingsKeys.notifications(), data);
+
+      // Update local notification schedules
+      if (user) {
+        try {
+          await updateNotificationSchedule(data, user.injectionDay);
+        } catch (error) {
+          console.warn('Failed to update notification schedule:', error);
+        }
+      }
     },
   });
 }

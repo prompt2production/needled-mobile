@@ -54,6 +54,8 @@ export default function WeighInScreen() {
   // Celebration state
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [justLoggedWeight, setJustLoggedWeight] = useState(false);
+  const [showAddEntryForm, setShowAddEntryForm] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Used to reset form after submission
   const confettiRef = useRef<any>(null);
   const celebrationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -93,21 +95,35 @@ export default function WeighInScreen() {
 
   // Handle weight submission
   const handleLogWeight = useCallback(
-    (weight: number) => {
+    (weight: number, date?: string) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       triggerCelebration();
 
       logWeighInMutation.mutate(
-        { weight },
+        { weight, date },
         {
           onSuccess: () => {
             setJustLoggedWeight(true);
+            setShowAddEntryForm(false); // Return to success state after logging
+            setFormKey((k) => k + 1); // Reset form for next entry
           },
         }
       );
     },
     [logWeighInMutation, triggerCelebration]
   );
+
+  // Handle showing the add entry form
+  const handleAddEntry = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowAddEntryForm(true);
+  }, []);
+
+  // Handle canceling add entry
+  const handleCancelAddEntry = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowAddEntryForm(false);
+  }, []);
 
   // Get user info from dashboard
   const weightUnit = dashboardData?.user?.weightUnit || 'kg';
@@ -118,8 +134,8 @@ export default function WeighInScreen() {
   const hasWeighedThisWeek = latestData?.hasWeighedThisWeek || false;
   const canWeighIn = latestData?.canWeighIn ?? true;
 
-  // Show success state if just logged or already weighed this week
-  const showSuccessState = justLoggedWeight || hasWeighedThisWeek;
+  // Show success state if just logged or already weighed this week (unless adding another entry)
+  const showSuccessState = (justLoggedWeight || hasWeighedThisWeek) && !showAddEntryForm;
 
   // Determine Pip state and message
   const getPipStateAndMessage = (): { state: PipState; message: string } => {
@@ -306,6 +322,74 @@ export default function WeighInScreen() {
                   />
                 )}
 
+                {/* Add Entry Button */}
+                <Pressable
+                  onPress={handleAddEntry}
+                  style={{
+                    backgroundColor: isDark ? '#1E1E2E' : '#FFFFFF',
+                    borderRadius: 16,
+                    paddingVertical: 16,
+                    paddingHorizontal: 20,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    borderWidth: 2,
+                    borderColor: '#14B8A6',
+                    borderStyle: 'dashed',
+                  }}
+                >
+                  <Text style={{ fontSize: 20 }}>+</Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: '#14B8A6',
+                    }}
+                  >
+                    Add Weight Entry
+                  </Text>
+                </Pressable>
+
+                <WeighInHistory
+                  weighIns={weighInHistory}
+                  isLoading={historyLoading}
+                  weightUnit={weightUnit}
+                  defaultExpanded={true}
+                />
+              </>
+            ) : showAddEntryForm ? (
+              // ADD ENTRY STATE: Show form with cancel option
+              <>
+                <WeighInForm
+                  key={`add-entry-${formKey}`}
+                  weightUnit={weightUnit}
+                  lastWeight={latestData?.weighIn?.weight || null}
+                  onSubmit={handleLogWeight}
+                  isSubmitting={logWeighInMutation.isPending}
+                />
+
+                {/* Cancel Button */}
+                <Pressable
+                  onPress={handleCancelAddEntry}
+                  disabled={logWeighInMutation.isPending}
+                  style={{
+                    paddingVertical: 14,
+                    alignItems: 'center',
+                    opacity: logWeighInMutation.isPending ? 0.5 : 1,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: isDark ? '#9CA3AF' : '#6B7280',
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </Pressable>
+
                 <WeighInHistory
                   weighIns={weighInHistory}
                   isLoading={historyLoading}
@@ -324,6 +408,7 @@ export default function WeighInScreen() {
                 />
 
                 <WeighInForm
+                  key={`initial-${formKey}`}
                   weightUnit={weightUnit}
                   lastWeight={latestData?.weighIn?.weight || null}
                   onSubmit={handleLogWeight}

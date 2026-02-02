@@ -3,7 +3,7 @@
  */
 
 import api from './api';
-import { WeighIn, WeighInLatest, CreateWeighInRequest } from '../types/api';
+import { WeighIn, WeighInLatest, CreateWeighInRequest, ChartTimeRange, WeightProgressData } from '../types/api';
 
 /**
  * Get latest weigh-in with stats
@@ -63,4 +63,17 @@ export const deleteWeighIn = async (id: string, userId: string): Promise<void> =
   await api.delete(`/weigh-ins/${id}`, {
     params: { userId },
   });
+};
+
+/**
+ * Get weight progress data for chart
+ */
+export const getWeightProgress = async (
+  userId: string,
+  range: ChartTimeRange = 'ALL'
+): Promise<WeightProgressData> => {
+  const response = await api.get<WeightProgressData>('/weigh-ins/progress', {
+    params: { userId, range },
+  });
+  return response.data;
 };

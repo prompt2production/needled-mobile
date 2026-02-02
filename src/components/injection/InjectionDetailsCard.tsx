@@ -140,6 +140,15 @@ export function InjectionDetailsCard({
           isDark={isDark}
         />
 
+        {/* Current Dosage (mg) - only show if available */}
+        {status.currentDosageMg && (
+          <InfoItem
+            label="Current Dosage"
+            value={`${status.currentDosageMg} mg`}
+            isDark={isDark}
+          />
+        )}
+
         {/* Doses Remaining */}
         <InfoItem
           label="Doses Left in Pen"

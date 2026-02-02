@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 
 import { useProfileSettings, useUpdateProfile, useDashboardData } from '@/hooks';
 import { Medication, InjectionDay } from '@/types/api';
+import { DatePicker } from '@/components/ui';
 
 const MEDICATIONS: { value: Medication; label: string }[] = [
   { value: 'OZEMPIC', label: 'Ozempic' },
@@ -48,6 +49,7 @@ export default function ProfileSettingsScreen() {
   // Form state
   const [name, setName] = useState('');
   const [goalWeight, setGoalWeight] = useState('');
+  const [goalDate, setGoalDate] = useState<Date | null>(null);
   const [medication, setMedication] = useState<Medication>('OZEMPIC');
   const [injectionDay, setInjectionDay] = useState<InjectionDay>(0);
 
@@ -58,10 +60,19 @@ export default function ProfileSettingsScreen() {
     if (settings) {
       setName(settings.name);
       setGoalWeight(settings.goalWeight?.toString() || '');
+      setGoalDate(settings.goalDate ? new Date(settings.goalDate) : null);
       setMedication(settings.medication);
       setInjectionDay(settings.injectionDay);
     }
   }, [settings]);
+
+  // Format date to YYYY-MM-DD string
+  const formatDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -75,6 +86,7 @@ export default function ProfileSettingsScreen() {
       await updateProfileMutation.mutateAsync({
         name: name.trim(),
         goalWeight: goalWeight ? parseFloat(goalWeight) : null,
+        goalDate: goalDate ? formatDateString(goalDate) : null,
         medication,
         injectionDay,
       });
@@ -192,6 +204,46 @@ export default function ProfileSettingsScreen() {
                 borderColor: isDark ? '#374151' : '#E5E7EB',
               }}
             />
+          </View>
+
+          {/* Target Date */}
+          <View style={{ marginBottom: 20 }}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '600',
+                color: isDark ? '#D1D5DB' : '#374151',
+                marginBottom: 8,
+              }}
+            >
+              Target Date
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: isDark ? '#9CA3AF' : '#6B7280',
+                marginBottom: 12,
+              }}
+            >
+              When do you want to reach your goal weight?
+            </Text>
+            <View
+              style={{
+                backgroundColor: isDark ? '#1E1E2E' : '#FFFFFF',
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: isDark ? '#374151' : '#E5E7EB',
+                padding: 12,
+              }}
+            >
+              <DatePicker
+                selectedDate={goalDate}
+                onDateChange={setGoalDate}
+                label="Target Date"
+                disabled={updateProfileMutation.isPending}
+                mode="future"
+              />
+            </View>
           </View>
 
           {/* Medication */}

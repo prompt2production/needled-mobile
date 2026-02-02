@@ -53,14 +53,40 @@ Colors are defined in `tailwind.config.js`:
 ## Running the App
 ```bash
 # Start development server (use port 8082 to avoid conflicts)
-npx expo start --port 8082
+npm start
 
-# Run on Android (requires Android Studio)
-npx expo start --android --port 8082
+# Run on Android emulator
+npm run android
+
+# Run on physical Android device via USB (auto-configures ADB)
+npm run android:device
 
 # Run on web (for quick testing)
-npx expo start --web --port 8082
+npm run web
+
+# Manual ADB setup (if needed)
+npm run adb:reverse
 ```
+
+## Physical Device Development (Android via USB)
+When connecting a physical Android device via USB:
+
+1. **Enable USB debugging** on your phone (Settings > Developer Options)
+2. **Connect via USB** and authorize the PC when prompted
+3. **Use the device script**: `npm run android:device`
+   - Auto-configures ADB reverse port forwarding
+   - Uses `--localhost` flag so Expo connects through USB tunnel
+   - Press `a` to launch on device once server starts
+
+The `adb:reverse` script forwards these ports from your phone to your PC:
+- **8081** - Default Metro bundler port
+- **8082** - Custom Metro port (used by this project)
+- **2810** - Backend API server
+
+**Troubleshooting "Failed to download remote update" errors:**
+1. Ensure USB debugging is authorized
+2. Run `npm run adb:reverse` manually
+3. Make sure you're using `--localhost` flag (included in `android:device` script)
 
 ## API Configuration
 - Full API docs: `docs/API_DOCUMENTATION.md`

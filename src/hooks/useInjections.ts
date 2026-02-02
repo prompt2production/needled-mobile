@@ -60,16 +60,17 @@ export function useLogInjection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { site: InjectionSite; notes?: string; date?: string }) =>
+    mutationFn: (data: { site: InjectionSite; notes?: string; date?: string; dosageMg?: number }) =>
       injectionsService.logInjection({
         userId: userId!,
         site: data.site,
         notes: data.notes,
         date: data.date,
+        dosageMg: data.dosageMg,
       }),
 
     // Optimistic update
-    onMutate: async ({ site, notes, date }) => {
+    onMutate: async ({ site, notes, date, dosageMg }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: injectionKeys.status(userId || '') });
       await queryClient.cancelQueries({ queryKey: injectionQueryKeys.history(userId || '') });
@@ -95,12 +96,14 @@ export function useLogInjection() {
               id: 'optimistic-' + Date.now(),
               site,
               doseNumber: previousStatus.nextDose,
+              dosageMg: dosageMg ?? previousStatus.currentDosageMg ?? null,
               date: date || new Date().toISOString(),
               notes: notes || null,
             },
             currentDose: previousStatus.nextDose,
             nextDose: previousStatus.nextDose === 4 ? 1 : ((previousStatus.nextDose + 1) as 1 | 2 | 3 | 4),
             dosesRemaining: previousStatus.nextDose === 4 ? 4 : previousStatus.dosesRemaining - 1,
+            currentDosageMg: dosageMg ?? previousStatus.currentDosageMg ?? null,
           }
         );
       }
@@ -113,6 +116,7 @@ export function useLogInjection() {
           date: date || new Date().toISOString(),
           site,
           doseNumber: previousStatus?.nextDose || 1,
+          dosageMg: dosageMg ?? previousStatus?.currentDosageMg ?? null,
           notes: notes || null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

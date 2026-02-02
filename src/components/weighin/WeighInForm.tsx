@@ -1,6 +1,6 @@
 /**
  * WeighInForm Component
- * Weight input form with validation
+ * Weight input form with validation and optional date selection for historical entries
  */
 
 import React, { useState, useCallback } from 'react';
@@ -14,11 +14,12 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { WeightUnit } from '@/types/api';
+import { DatePicker } from '@/components/ui';
 
 interface WeighInFormProps {
   weightUnit: WeightUnit;
   lastWeight: number | null;
-  onSubmit: (weight: number) => void;
+  onSubmit: (weight: number, date?: string) => void;
   isSubmitting: boolean;
 }
 
@@ -33,6 +34,7 @@ export function WeighInForm({
 
   const [weightInput, setWeightInput] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // Get min/max based on unit
   const getRange = () => {
@@ -43,6 +45,14 @@ export function WeighInForm({
   };
 
   const { min, max } = getRange();
+
+  // Format date to YYYY-MM-DD string
+  const formatDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   // Validate and submit
   const handleSubmit = useCallback(() => {
@@ -66,8 +76,11 @@ export function WeighInForm({
     }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    onSubmit(weight);
-  }, [weightInput, min, max, weightUnit, onSubmit]);
+
+    // Pass date if a historical date is selected
+    const dateString = selectedDate ? formatDateString(selectedDate) : undefined;
+    onSubmit(weight, dateString);
+  }, [weightInput, min, max, weightUnit, onSubmit, selectedDate]);
 
   // Format placeholder with last weight
   const getPlaceholder = () => {
@@ -99,11 +112,21 @@ export function WeighInForm({
         style={{
           fontSize: 14,
           color: isDark ? '#9CA3AF' : '#6B7280',
-          marginBottom: 20,
+          marginBottom: 16,
         }}
       >
         Track your progress with a weekly weigh-in
       </Text>
+
+      {/* Date Picker for historical entries */}
+      <View style={{ marginBottom: 16 }}>
+        <DatePicker
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          disabled={isSubmitting}
+          label="Weigh-in Date"
+        />
+      </View>
 
       {/* Weight Input */}
       <View

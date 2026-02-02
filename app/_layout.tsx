@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme, View, ActivityIndicator } from "react-native";
 import { useAuthStore } from "../src/stores/authStore";
+import { useNotificationsSetup } from "../src/hooks";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -16,6 +17,12 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Initialize notifications when user is authenticated
+function NotificationsInitializer() {
+  useNotificationsSetup();
+  return null;
+}
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isInitialized, isNewUser, checkSession } = useAuthStore();
@@ -57,7 +64,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {isAuthenticated && <NotificationsInitializer />}
+      {children}
+    </>
+  );
 }
 
 export default function RootLayout() {
@@ -72,6 +84,13 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modals"
+              options={{
+                headerShown: false,
+                presentation: 'modal',
+              }}
+            />
           </Stack>
         </AuthGate>
       </SafeAreaProvider>

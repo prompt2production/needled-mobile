@@ -17,3 +17,4 @@ export * as injectionsService from './injections';
 export * as weighinsService from './weighins';
 export * as calendarService from './calendar';
 export * as settingsService from './settings';
+export * as notificationsService from './notifications';
