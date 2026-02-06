@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
 export interface ProgressDotsProps {
   totalSteps: number;
@@ -8,24 +8,10 @@ export interface ProgressDotsProps {
 
 export function ProgressDots({ totalSteps, currentStep }: ProgressDotsProps) {
   return (
-    <View className="flex-row items-center justify-center gap-2">
-      {Array.from({ length: totalSteps }, (_, index) => {
-        const isActive = index === currentStep;
-        const isCompleted = index < currentStep;
-
-        return (
-          <View
-            key={index}
-            className={`rounded-full ${
-              isActive
-                ? 'w-8 h-2 bg-white'
-                : isCompleted
-                  ? 'w-2 h-2 bg-white/70'
-                  : 'w-2 h-2 bg-white/30'
-            }`}
-          />
-        );
-      })}
+    <View className="flex-row items-center justify-center">
+      <Text className="text-white/80 font-medium text-sm">
+        Step {currentStep + 1} of {totalSteps}
+      </Text>
     </View>
   );
 }

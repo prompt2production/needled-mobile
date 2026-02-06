@@ -12,6 +12,9 @@ interface InjectionSuccessCardProps {
   injectionDay: number; // 0-6 for Monday-Sunday
 }
 
+// Default values for backwards compatibility
+const DEFAULT_DOSES_PER_PEN = 4;
+
 const siteNames: Record<InjectionSite, string> = {
   ABDOMEN_LEFT: 'Abdomen Left',
   ABDOMEN_RIGHT: 'Abdomen Right',
@@ -32,6 +35,9 @@ export function InjectionSuccessCard({
 
   const lastInjection = status.lastInjection;
   const doseNumber = status.currentDose || lastInjection?.doseNumber || 1;
+  const dosesPerPen = status.dosesPerPen || DEFAULT_DOSES_PER_PEN;
+  const tracksGoldenDose = status.tracksGoldenDose || false;
+  const isGoldenDose = lastInjection?.isGoldenDose || false;
 
   // Format the date
   const formatDate = (dateStr: string) => {
@@ -54,8 +60,8 @@ export function InjectionSuccessCard({
     return `In ${status.daysUntil} days`;
   };
 
-  // Progress bar percentage (dose X of 4)
-  const progressPercent = (doseNumber / 4) * 100;
+  // Progress bar percentage (dose X of dosesPerPen)
+  const progressPercent = isGoldenDose ? 100 : (doseNumber / dosesPerPen) * 100;
 
   return (
     <View
@@ -214,10 +220,14 @@ export function InjectionSuccessCard({
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? '#9CA3AF' : '#6B7280',
+              color: isGoldenDose ? '#F59E0B' : isDark ? '#9CA3AF' : '#6B7280',
             }}
           >
-            Dose {doseNumber} of 4
+            {isGoldenDose
+              ? 'Golden Dose Complete! ✨'
+              : tracksGoldenDose
+              ? `Dose ${doseNumber} of ${dosesPerPen} + ✨`
+              : `Dose ${doseNumber} of ${dosesPerPen}`}
           </Text>
         </View>
 
@@ -234,45 +244,73 @@ export function InjectionSuccessCard({
             style={{
               width: `${progressPercent}%`,
               height: '100%',
-              backgroundColor: '#14B8A6',
+              backgroundColor: isGoldenDose ? '#F59E0B' : '#14B8A6',
               borderRadius: 6,
             }}
           />
         </View>
 
-        {/* Dose dots */}
+        {/* Dose dots - dynamic based on dosesPerPen */}
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginTop: 6,
             paddingHorizontal: 4,
+            alignItems: 'center',
           }}
         >
-          {[1, 2, 3, 4].map((dose) => (
-            <View
-              key={dose}
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: 10,
-                backgroundColor:
-                  dose <= doseNumber
+          {Array.from({ length: dosesPerPen }).map((_, index) => {
+            const dose = index + 1;
+            const isFilled = dose <= doseNumber;
+            return (
+              <View
+                key={dose}
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: isFilled
                     ? '#14B8A6'
                     : isDark
                     ? '#374151'
                     : '#E5E7EB',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {dose <= doseNumber && (
-                <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>
-                  {dose}
-                </Text>
-              )}
-            </View>
-          ))}
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {isFilled && (
+                  <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>
+                    {dose}
+                  </Text>
+                )}
+              </View>
+            );
+          })}
+          {/* Golden dose indicator */}
+          {tracksGoldenDose && (
+            <>
+              <Text style={{ color: isDark ? '#6B7280' : '#9CA3AF', marginHorizontal: 2 }}>
+                —
+              </Text>
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: isGoldenDose
+                    ? '#F59E0B'
+                    : isDark
+                    ? 'rgba(252, 211, 77, 0.2)'
+                    : '#FEF3C7',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 10 }}>✨</Text>
+              </View>
+            </>
+          )}
         </View>
       </View>
 

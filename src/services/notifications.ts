@@ -9,16 +9,22 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import api from './api';
 
+// Check if running in Expo Go (push notifications not supported)
+const isExpoGo = Constants.appOwnership === 'expo';
+
 // Configure how notifications are handled when app is in foreground
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// Only set up if NOT in Expo Go (push notifications removed from Expo Go in SDK 53)
+if (!isExpoGo) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 export interface PushTokenResponse {
   success: boolean;
@@ -59,6 +65,12 @@ export async function requestPermissions(): Promise<boolean> {
  * Returns null if unable to get token
  */
 export async function getExpoPushToken(): Promise<string | null> {
+  // Push tokens not available in Expo Go
+  if (isExpoGo) {
+    console.warn('Push notifications are not supported in Expo Go. Use a development build.');
+    return null;
+  }
+
   if (!Device.isDevice) {
     console.warn('Push notifications only work on physical devices');
     return null;

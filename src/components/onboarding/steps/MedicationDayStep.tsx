@@ -3,15 +3,7 @@ import { View, Text } from 'react-native';
 import { WizardStep } from '../WizardStep';
 import { ChipSelector, ChipOption } from '../../ui/ChipSelector';
 import { Medication, InjectionDay } from '../../../types/api';
-import { getDosageOptions, hasDosageTracking } from '../../../constants/dosages';
-
-const MEDICATIONS: ChipOption<Medication>[] = [
-  { value: 'OZEMPIC', label: 'Ozempic' },
-  { value: 'WEGOVY', label: 'Wegovy' },
-  { value: 'MOUNJARO', label: 'Mounjaro' },
-  { value: 'ZEPBOUND', label: 'Zepbound' },
-  { value: 'OTHER', label: 'Other' },
-];
+import { useMedicationOptions } from '../../../hooks/useMedicationConfig';
 
 const DAYS: ChipOption<InjectionDay>[] = [
   { value: 0, label: 'Mon' },
@@ -23,38 +15,29 @@ const DAYS: ChipOption<InjectionDay>[] = [
   { value: 6, label: 'Sun' },
 ];
 
-export interface MedicationStepProps {
+export interface MedicationDayStepProps {
   medication: Medication | null;
   injectionDay: InjectionDay | null;
-  dosage: number | null;
   onMedicationChange: (medication: Medication) => void;
   onInjectionDayChange: (day: InjectionDay) => void;
-  onDosageChange: (dosage: number) => void;
   onNext: () => void;
   onBack: () => void;
   currentStep: number;
   totalSteps: number;
 }
 
-export function MedicationStep({
+export function MedicationDayStep({
   medication,
   injectionDay,
-  dosage,
   onMedicationChange,
   onInjectionDayChange,
-  onDosageChange,
   onNext,
   onBack,
   currentStep,
   totalSteps,
-}: MedicationStepProps) {
-  const showDosage = medication !== null && hasDosageTracking(medication);
-  const dosageOptions = medication ? getDosageOptions(medication) : [];
-
-  // Validation: medication and injection day required, dosage required only if applicable
-  const isValid = medication !== null &&
-    injectionDay !== null &&
-    (!showDosage || dosage !== null);
+}: MedicationDayStepProps) {
+  const medicationOptions = useMedicationOptions();
+  const isValid = medication !== null && injectionDay !== null;
 
   return (
     <WizardStep
@@ -70,8 +53,11 @@ export function MedicationStep({
       <View>
         {/* Medication Selection */}
         <View className="mb-6">
+          <Text className="text-white/80 text-base mb-4 font-medium">
+            Your medication
+          </Text>
           <ChipSelector
-            options={MEDICATIONS}
+            options={medicationOptions}
             value={medication}
             onChange={onMedicationChange}
             variant="light"
@@ -93,24 +79,9 @@ export function MedicationStep({
             />
           </View>
         )}
-
-        {/* Dosage Selection - shows after injection day is selected (only for medications with dosage tracking) */}
-        {medication && injectionDay !== null && showDosage && (
-          <View>
-            <Text className="text-white/80 text-base mb-4 font-medium">
-              What's your current dosage?
-            </Text>
-            <ChipSelector
-              options={dosageOptions}
-              value={dosage}
-              onChange={onDosageChange}
-              variant="light"
-            />
-          </View>
-        )}
       </View>
     </WizardStep>
   );
 }
 
-export default MedicationStep;
+export default MedicationDayStep;

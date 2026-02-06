@@ -67,8 +67,8 @@ export function WeightStep({
       currentStep={currentStep}
       totalSteps={totalSteps}
       pipState="proud"
-      heading="Almost there!"
-      subheading="Let's set up your weight tracking"
+      heading="Let's set up your tracking"
+      subheading="We'll use this to show your progress"
       onNext={onNext}
       onBack={onBack}
       isNextDisabled={!isValid}

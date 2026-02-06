@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import ConfettiCannon from "react-native-confetti-cannon";
 
 import { PipWithBubble } from "@/components/pip";
@@ -18,6 +18,7 @@ import {
   WeightProgressCard,
   HabitsSection,
 } from "@/components/dashboard";
+import { AppHeader, MenuDropdown } from "@/components/navigation";
 import { determinePipState } from "@/lib/pip-logic";
 import { getInjectionDayName } from "@/lib/mock-data";
 import {
@@ -31,6 +32,11 @@ import { HabitType } from "@/types/api";
 const { width: screenWidth } = Dimensions.get("window");
 
 export default function DashboardScreen() {
+  const router = useRouter();
+
+  // Menu state
+  const [menuVisible, setMenuVisible] = useState(false);
+
   // Fetch real data
   const {
     data: dashboardData,
@@ -52,6 +58,15 @@ export default function DashboardScreen() {
   } = useInjectionStatus();
 
   const toggleHabitMutation = useToggleHabit();
+
+  // Handle menu actions
+  const handleMenuLogAction = useCallback((action: 'injection' | 'weight') => {
+    if (action === 'injection') {
+      router.push('/modals/injection');
+    } else {
+      router.push('/modals/weigh-in');
+    }
+  }, [router]);
 
   // Local state for celebration
   const [isCelebrating, setIsCelebrating] = useState(false);
@@ -117,21 +132,28 @@ export default function DashboardScreen() {
 
   if (isLoading && !dashboardData) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Home" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2C9C91" />
           <Text className="text-gray-500 dark:text-gray-400 mt-4">
             Loading your dashboard...
           </Text>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   // Error state
   if (dashboardError) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Home" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center p-6">
           <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             Oops!
@@ -146,7 +168,12 @@ export default function DashboardScreen() {
             <Text className="text-white font-semibold">Retry</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
@@ -181,7 +208,8 @@ export default function DashboardScreen() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+    <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+      <AppHeader title="Home" onMenuPress={() => setMenuVisible(true)} />
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -197,20 +225,13 @@ export default function DashboardScreen() {
       >
         {/* Header */}
         <View className="px-4 pt-4 pb-2">
-          <View className="flex-row justify-between items-start">
-            <View>
-              <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-                Hey, {dashboardData?.user.name || "there"}!
-              </Text>
-              <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {dateString}
-              </Text>
-            </View>
-            <Link href="/settings" asChild>
-              <Pressable className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 items-center justify-center">
-                <Text className="text-lg">⚙️</Text>
-              </Pressable>
-            </Link>
+          <View>
+            <Text className="text-2xl font-bold text-gray-900 dark:text-white">
+              Hey, {dashboardData?.user.name || "there"}!
+            </Text>
+            <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {dateString}
+            </Text>
           </View>
         </View>
 
@@ -244,9 +265,13 @@ export default function DashboardScreen() {
             <NextDoseCard
               daysUntil={injectionStatus.daysUntil}
               injectionDay={getInjectionDayName(dashboardData.user.injectionDay)}
-              currentDose={injectionStatus.currentDose}
-              dosesRemaining={injectionStatus.dosesRemaining}
+              currentDose={injectionStatus.nextDose}
+              dosesRemaining={(injectionStatus.dosesPerPen ?? 4) - injectionStatus.nextDose}
               status={injectionStatus.status}
+              dosesPerPen={injectionStatus.dosesPerPen}
+              tracksGoldenDose={injectionStatus.tracksGoldenDose}
+              isGoldenDoseAvailable={injectionStatus.isGoldenDoseAvailable}
+              isOnGoldenDose={injectionStatus.isOnGoldenDose}
             />
           )}
 
@@ -284,6 +309,13 @@ export default function DashboardScreen() {
         colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
         autoStartDelay={0}
       />
-    </SafeAreaView>
+
+      {/* Menu Dropdown */}
+      <MenuDropdown
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        onLogAction={handleMenuLogAction}
+      />
+    </View>
   );
 }

@@ -5,10 +5,20 @@
 
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 import { User, RegisterRequest } from '../types/api';
 import * as authApi from '../services/auth';
 import { AUTH_TOKEN_KEY, setOnUnauthorized, clearToken } from '../services/api';
-import { unregisterPushToken, cancelAllScheduledNotifications } from '../services/notifications';
+
+// Check if running in Expo Go (push notifications not supported)
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Lazy-load notifications module to avoid Expo Go errors
+// (expo-notifications has auto-registration code that fails in Expo Go)
+const getNotifications = async () => {
+  if (isExpoGo) return null;
+  return import('../services/notifications');
+};
 
 interface AuthState {
   user: User | null;
@@ -88,11 +98,15 @@ export const useAuthStore = create<AuthState>((set, get) => {
       set({ isLoading: true });
       try {
         // Unregister push token and cancel local notifications (best effort)
+        // Only attempt if not in Expo Go
         try {
-          await Promise.all([
-            unregisterPushToken(),
-            cancelAllScheduledNotifications(),
-          ]);
+          const notifications = await getNotifications();
+          if (notifications) {
+            await Promise.all([
+              notifications.unregisterPushToken(),
+              notifications.cancelAllScheduledNotifications(),
+            ]);
+          }
         } catch (e) {
           console.warn('Failed to cleanup notifications:', e);
         }

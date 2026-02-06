@@ -1,12 +1,15 @@
 import "../global.css";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme, View, ActivityIndicator } from "react-native";
+import Constants from "expo-constants";
 import { useAuthStore } from "../src/stores/authStore";
-import { useNotificationsSetup } from "../src/hooks";
+
+// Check if running in Expo Go (push notifications not supported)
+const isExpoGo = Constants.appOwnership === 'expo';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -18,10 +21,25 @@ const queryClient = new QueryClient({
   },
 });
 
+// Lazy load notifications component to prevent expo-notifications import in Expo Go
+const NotificationsSetupComponent = lazy(() =>
+  import("../src/components/NotificationsSetup").then((module) => ({
+    default: module.NotificationsSetup,
+  }))
+);
+
 // Initialize notifications when user is authenticated
+// Only loads in development builds (not Expo Go)
 function NotificationsInitializer() {
-  useNotificationsSetup();
-  return null;
+  if (isExpoGo) {
+    return null;
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <NotificationsSetupComponent />
+    </Suspense>
+  );
 }
 
 function AuthGate({ children }: { children: React.ReactNode }) {

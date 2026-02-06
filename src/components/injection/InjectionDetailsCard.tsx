@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, useColorScheme, Image } from 'react-native';
 import { InjectionStatusResponse, Medication, InjectionSite, DoseNumber } from '@/types/api';
+import { getDoseDisplayText, getDosesRemainingText } from '@/constants/dosages';
 
 interface InjectionDetailsCardProps {
   status: InjectionStatusResponse;
@@ -133,11 +134,17 @@ export function InjectionDetailsCard({
 
       {/* Info Grid */}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-        {/* Dose Number */}
+        {/* Dose Number - now dynamic */}
         <InfoItem
           label="Dose"
-          value={`${status.nextDose} of 4`}
+          value={getDoseDisplayText(
+            status.nextDose,
+            status.dosesPerPen || 4,
+            status.isOnGoldenDose || false,
+            status.tracksGoldenDose || false
+          )}
           isDark={isDark}
+          isGolden={status.isOnGoldenDose}
         />
 
         {/* Current Dosage (mg) - only show if available */}
@@ -149,10 +156,14 @@ export function InjectionDetailsCard({
           />
         )}
 
-        {/* Doses Remaining */}
+        {/* Doses Remaining - calculated from current position */}
         <InfoItem
           label="Doses Left in Pen"
-          value={status.dosesRemaining.toString()}
+          value={getDosesRemainingText(
+            (status.dosesPerPen || 4) - status.nextDose,
+            status.isGoldenDoseAvailable || false,
+            status.tracksGoldenDose || false
+          )}
           isDark={isDark}
         />
 
@@ -180,21 +191,36 @@ interface InfoItemProps {
   value: string;
   isDark: boolean;
   highlight?: boolean;
+  isGolden?: boolean;
 }
 
-function InfoItem({ label, value, isDark, highlight = false }: InfoItemProps) {
+function InfoItem({ label, value, isDark, highlight = false, isGolden = false }: InfoItemProps) {
+  const getBackgroundColor = () => {
+    if (isGolden) {
+      return isDark ? 'rgba(252, 211, 77, 0.1)' : '#FFFBEB';
+    }
+    if (highlight) {
+      return isDark ? 'rgba(20, 184, 166, 0.1)' : '#F0FDFA';
+    }
+    return isDark ? '#374151' : '#F9FAFB';
+  };
+
+  const getTextColor = () => {
+    if (isGolden) {
+      return '#F59E0B';
+    }
+    if (highlight) {
+      return '#14B8A6';
+    }
+    return isDark ? '#F9FAFB' : '#111827';
+  };
+
   return (
     <View
       style={{
         flex: 1,
         minWidth: '45%',
-        backgroundColor: highlight
-          ? isDark
-            ? 'rgba(20, 184, 166, 0.1)'
-            : '#F0FDFA'
-          : isDark
-          ? '#374151'
-          : '#F9FAFB',
+        backgroundColor: getBackgroundColor(),
         borderRadius: 12,
         padding: 12,
       }}
@@ -212,11 +238,7 @@ function InfoItem({ label, value, isDark, highlight = false }: InfoItemProps) {
         style={{
           fontSize: 15,
           fontWeight: '600',
-          color: highlight
-            ? '#14B8A6'
-            : isDark
-            ? '#F9FAFB'
-            : '#111827',
+          color: getTextColor(),
         }}
       >
         {value}

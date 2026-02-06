@@ -8,16 +8,30 @@ import {
   Pressable,
   useColorScheme,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 import { useWeightProgress, useDashboardData } from '@/hooks';
 import { PipWithBubble } from '@/components/pip';
 import { WeightChart, StatsGrid, TimeRangeTabs } from '@/components/progress';
+import { AppHeader, MenuDropdown } from '@/components/navigation';
 import { ChartTimeRange } from '@/types/api';
 
 export default function ResultsScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const router = useRouter();
+
+  // Menu state
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  // Handle menu actions
+  const handleMenuLogAction = useCallback((action: 'injection' | 'weight') => {
+    if (action === 'injection') {
+      router.push('/modals/injection');
+    } else {
+      router.push('/modals/weigh-in');
+    }
+  }, [router]);
 
   // Time range state
   const [selectedRange, setSelectedRange] = useState<ChartTimeRange>('ALL');
@@ -100,21 +114,28 @@ export default function ResultsScreen() {
   // Loading state
   if (isLoading && !progressData) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={['top']}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Results" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2C9C91" />
           <Text className="text-gray-500 dark:text-gray-400 mt-4">
             Loading your progress...
           </Text>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={['top']}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Results" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center p-6">
           <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             Oops!
@@ -129,12 +150,18 @@ export default function ResultsScreen() {
             <Text className="text-white font-semibold">Retry</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={['top']}>
+    <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+      <AppHeader title="Results" onMenuPress={() => setMenuVisible(true)} />
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -148,19 +175,6 @@ export default function ResultsScreen() {
           />
         }
       >
-        {/* Header */}
-        <View className="px-4 pt-4 pb-2">
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '700',
-              color: isDark ? '#F9FAFB' : '#111827',
-            }}
-          >
-            Your Progress
-          </Text>
-        </View>
-
         {/* Pip with Speech Bubble */}
         <View className="px-4 py-4">
           <PipWithBubble
@@ -271,6 +285,13 @@ export default function ResultsScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+
+      {/* Menu Dropdown */}
+      <MenuDropdown
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        onLogAction={handleMenuLogAction}
+      />
+    </View>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import { Card, ProgressBar } from "@/components/ui";
 import { DoseNumber } from "@/types/api";
+import { getDoseDisplayText, getDosesRemainingText } from "@/constants/dosages";
 
 export interface NextDoseCardProps {
   daysUntil: number;
@@ -9,6 +10,11 @@ export interface NextDoseCardProps {
   currentDose: DoseNumber | null;
   dosesRemaining: number;
   status: "due" | "done" | "overdue" | "upcoming";
+  // New props for flexible pen tracking
+  dosesPerPen?: number;
+  tracksGoldenDose?: boolean;
+  isGoldenDoseAvailable?: boolean;
+  isOnGoldenDose?: boolean;
 }
 
 export function NextDoseCard({
@@ -17,6 +23,10 @@ export function NextDoseCard({
   currentDose,
   dosesRemaining,
   status,
+  dosesPerPen = 4,
+  tracksGoldenDose = false,
+  isGoldenDoseAvailable = false,
+  isOnGoldenDose = false,
 }: NextDoseCardProps) {
   const getStatusText = () => {
     switch (status) {
@@ -47,6 +57,21 @@ export function NextDoseCard({
   const progressValue =
     status === "done" ? 100 : Math.max(0, ((7 - daysUntil) / 7) * 100);
 
+  // Get dynamic dose display text
+  const doseDisplayText = getDoseDisplayText(
+    currentDose ?? 1,
+    dosesPerPen,
+    isOnGoldenDose,
+    tracksGoldenDose
+  );
+
+  // Get doses remaining text
+  const dosesRemainingText = getDosesRemainingText(
+    dosesRemaining,
+    isGoldenDoseAvailable,
+    tracksGoldenDose
+  );
+
   return (
     <Card className="mb-4">
       <View className="flex-row justify-between items-start mb-3">
@@ -58,9 +83,21 @@ export function NextDoseCard({
             {getStatusText()}
           </Text>
         </View>
-        <View className="bg-teal-100 dark:bg-teal-900/30 px-3 py-1.5 rounded-full">
-          <Text className="text-teal-700 dark:text-teal-300 font-semibold text-sm">
-            Dose {currentDose || 1}/4
+        <View
+          className={`px-3 py-1.5 rounded-full ${
+            isOnGoldenDose
+              ? "bg-yellow-100 dark:bg-yellow-900/30"
+              : "bg-teal-100 dark:bg-teal-900/30"
+          }`}
+        >
+          <Text
+            className={`font-semibold text-sm ${
+              isOnGoldenDose
+                ? "text-yellow-700 dark:text-yellow-300"
+                : "text-teal-700 dark:text-teal-300"
+            }`}
+          >
+            {doseDisplayText}
           </Text>
         </View>
       </View>
@@ -77,7 +114,7 @@ export function NextDoseCard({
           {injectionDay}s
         </Text>
         <Text className="text-sm text-gray-500 dark:text-gray-400">
-          {dosesRemaining} doses left in pen
+          {dosesRemainingText}
         </Text>
       </View>
     </Card>

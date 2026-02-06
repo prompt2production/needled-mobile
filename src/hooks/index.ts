@@ -68,6 +68,8 @@ export {
   useDeleteAccount,
   useNotificationPreferences,
   useUpdateNotificationPreferences,
+  usePenDosingSettings,
+  useUpdatePenDosing,
   settingsKeys,
 } from './useSettings';
 
@@ -85,9 +87,27 @@ export type {
 } from './useJourneyData';
 
 export {
-  useNotificationsSetup,
-  useUpdateNotificationSchedule,
-  useUnregisterPushToken,
-  useCancelAllNotifications,
-  notificationKeys,
-} from './useNotifications';
+  useMedicationConfig,
+  useMedicationOptions,
+  usePenStrengthOptions,
+  useDosageOptions,
+  useDosageValues,
+  useMicrodoseAmounts,
+  useHasDosageTracking,
+  useSupportsMicrodosing,
+  useMedicationConfigByCode,
+  useDefaultDosesPerPen,
+  useSuggestedMicrodoseAmounts,
+  medicationConfigKeys,
+} from './useMedicationConfig';
+
+// Note: Notification hooks are NOT exported here to prevent expo-notifications
+// from being eagerly loaded in Expo Go (where push notifications aren't supported).
+// Import directly from './useNotifications' in development builds only.
+// export {
+//   useNotificationsSetup,
+//   useUpdateNotificationSchedule,
+//   useUnregisterPushToken,
+//   useCancelAllNotifications,
+//   notificationKeys,
+// } from './useNotifications';

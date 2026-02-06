@@ -4,21 +4,37 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Constants from 'expo-constants';
 import { useAuthStore } from '../stores/authStore';
 import * as settingsService from '../services/settings';
-import { updateNotificationSchedule } from '../services/notifications';
 import {
   ProfileSettings,
   UpdateProfileRequest,
   NotificationPreferences,
+  PenDosingSettings,
+  UpdatePenDosingRequest,
 } from '../types/api';
 import { dashboardKeys } from './useDashboard';
+
+// Check if running in Expo Go (push notifications not supported)
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Lazy load updateNotificationSchedule to prevent expo-notifications import in Expo Go
+const updateNotificationScheduleLazy = async (
+  preferences: NotificationPreferences,
+  injectionDay: number
+) => {
+  if (isExpoGo) return; // Skip in Expo Go
+  const { updateNotificationSchedule } = await import('../services/notifications');
+  return updateNotificationSchedule(preferences, injectionDay);
+};
 
 // Query keys
 export const settingsKeys = {
   all: ['settings'] as const,
   profile: () => [...settingsKeys.all, 'profile'] as const,
   notifications: () => [...settingsKeys.all, 'notifications'] as const,
+  penDosing: () => [...settingsKeys.all, 'penDosing'] as const,
 };
 
 /**
@@ -67,7 +83,7 @@ export function useUpdateProfile() {
         );
         if (preferences) {
           try {
-            await updateNotificationSchedule(preferences, data.injectionDay);
+            await updateNotificationScheduleLazy(preferences, data.injectionDay);
           } catch (error) {
             console.warn('Failed to update notification schedule:', error);
           }
@@ -166,11 +182,55 @@ export function useUpdateNotificationPreferences() {
       // Update local notification schedules
       if (user) {
         try {
-          await updateNotificationSchedule(data, user.injectionDay);
+          await updateNotificationScheduleLazy(data, user.injectionDay);
         } catch (error) {
           console.warn('Failed to update notification schedule:', error);
         }
       }
+    },
+  });
+}
+
+/**
+ * Fetch pen and dosing settings
+ */
+export function usePenDosingSettings() {
+  const { user } = useAuthStore();
+
+  return useQuery({
+    queryKey: settingsKeys.penDosing(),
+    queryFn: () => settingsService.getPenDosingSettings(),
+    enabled: !!user,
+    staleTime: 1000 * 60 * 10, // 10 minutes
+  });
+}
+
+/**
+ * Update pen and dosing settings mutation
+ */
+export function useUpdatePenDosing() {
+  const queryClient = useQueryClient();
+  const { updateUser } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (data: UpdatePenDosingRequest) => settingsService.updatePenDosing(data),
+
+    onSuccess: (data: PenDosingSettings) => {
+      // Update the pen dosing cache
+      queryClient.setQueryData(settingsKeys.penDosing(), data);
+
+      // Update the auth store user with new pen/dosing settings
+      updateUser({
+        dosingMode: data.dosingMode,
+        penStrengthMg: data.penStrengthMg,
+        doseAmountMg: data.doseAmountMg,
+        dosesPerPen: data.dosesPerPen,
+        tracksGoldenDose: data.tracksGoldenDose,
+        currentDoseInPen: data.currentDoseInPen,
+      });
+
+      // Invalidate dashboard to reflect injection status changes
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }

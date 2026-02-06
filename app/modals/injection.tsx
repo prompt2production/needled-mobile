@@ -466,6 +466,35 @@ export default function InjectionModal() {
                   />
                 )}
 
+                {/* Settings Link */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push('/settings/pen-dosing');
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingVertical: 8,
+                    gap: 6,
+                  }}
+                >
+                  <Ionicons
+                    name="settings-outline"
+                    size={16}
+                    color={isDark ? '#9CA3AF' : '#6B7280'}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: isDark ? '#9CA3AF' : '#6B7280',
+                    }}
+                  >
+                    Need to update your pen or dosing settings?
+                  </Text>
+                </Pressable>
+
                 {/* Notes Input */}
                 <View
                   style={{

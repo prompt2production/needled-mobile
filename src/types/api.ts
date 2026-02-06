@@ -23,8 +23,17 @@ export type InjectionStatus = 'due' | 'done' | 'overdue' | 'upcoming';
 // 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
 export type InjectionDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-// GLP-1 pens contain 4 doses
-export type DoseNumber = 1 | 2 | 3 | 4;
+// Dosing mode for flexible pen tracking
+export type DosingMode = 'STANDARD' | 'MICRODOSE';
+
+// Dose type for distinguishing standard doses from golden doses
+export type DoseType = 'standard' | 'golden';
+
+// DoseNumber is now dynamic based on dosesPerPen (1-based)
+// For standard users: typically 1-4
+// For microdosers: varies based on penStrength/doseAmount
+// Golden dose is tracked separately via isGoldenDose flag
+export type DoseNumber = number;
 
 // User
 export interface User {
@@ -39,6 +48,15 @@ export interface User {
   injectionDay: InjectionDay;
   currentDosage: number | null; // Current medication dosage in mg
   height: number | null; // Height in cm (for BMI calculation)
+
+  // Pen & Dosing Settings
+  dosingMode: DosingMode; // 'standard' or 'microdose'
+  penStrengthMg: number | null; // Total mg in pen (for microdosers)
+  doseAmountMg: number | null; // Amount per injection (for microdosers)
+  dosesPerPen: number; // Calculated: standard=4, micro=penStrength/doseAmount
+  tracksGoldenDose: boolean; // Whether user extracts golden dose
+  currentDoseInPen: number; // Which dose they're on (1-based)
+
   createdAt: string;
   updatedAt: string;
 }
@@ -60,6 +78,14 @@ export interface RegisterRequest {
   injectionDay: InjectionDay;
   startingDosage?: number; // Starting medication dosage in mg
   height?: number; // Height in cm
+
+  // Pen & Dosing Settings
+  dosingMode?: DosingMode; // Defaults to 'standard'
+  penStrengthMg?: number; // For microdosers: total mg in pen
+  doseAmountMg?: number; // For microdosers: amount per injection
+  dosesPerPen?: number; // Calculated or default 4
+  tracksGoldenDose?: boolean; // Defaults to false
+  currentDoseInPen?: number; // Defaults to 1
 }
 
 export interface AuthResponse {
@@ -99,6 +125,7 @@ export interface Injection {
   site: InjectionSite;
   doseNumber: DoseNumber;
   dosageMg: number | null; // Medication dosage at time of injection
+  isGoldenDose: boolean; // Whether this was a golden dose extraction
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -113,6 +140,7 @@ export interface InjectionStatusResponse {
     site: InjectionSite;
     doseNumber: DoseNumber;
     dosageMg: number | null;
+    isGoldenDose: boolean;
     date: string;
     notes: string | null;
   } | null;
@@ -121,6 +149,12 @@ export interface InjectionStatusResponse {
   nextDose: DoseNumber;
   dosesRemaining: number;
   currentDosageMg: number | null; // User's current dosage in mg
+
+  // Pen & Dosing Info
+  dosesPerPen: number; // Total doses in pen (4 for standard, variable for micro)
+  tracksGoldenDose: boolean; // Whether golden dose tracking is enabled
+  isGoldenDoseAvailable: boolean; // True if all standard doses used but golden not yet taken
+  isOnGoldenDose: boolean; // True if next dose is the golden dose
 }
 
 export interface CreateInjectionRequest {
@@ -128,6 +162,7 @@ export interface CreateInjectionRequest {
   site: InjectionSite;
   doseNumber?: DoseNumber;
   dosageMg?: number; // Medication dosage in mg
+  isGoldenDose?: boolean; // True if logging a golden dose
   notes?: string;
   date?: string;
 }
@@ -265,6 +300,25 @@ export interface UpdateProfileRequest {
   height?: number | null;
 }
 
+// Pen & Dosing Settings Update
+export interface UpdatePenDosingRequest {
+  dosingMode: DosingMode;
+  penStrengthMg?: number | null; // For microdosers
+  doseAmountMg?: number | null; // For microdosers
+  dosesPerPen?: number; // Will be calculated if not provided
+  tracksGoldenDose: boolean;
+  currentDoseInPen: number;
+}
+
+export interface PenDosingSettings {
+  dosingMode: DosingMode;
+  penStrengthMg: number | null;
+  doseAmountMg: number | null;
+  dosesPerPen: number;
+  tracksGoldenDose: boolean;
+  currentDoseInPen: number;
+}
+
 // Weight Progress Chart
 export type ChartTimeRange = '1M' | '3M' | '6M' | 'ALL';
 
@@ -289,4 +343,20 @@ export interface WeightProgressStats {
   goalProgress: number | null;
   toGoal: number | null;
   weeklyAverage: number | null;
+}
+
+// Medication Configuration (from /api/medications endpoint)
+export interface MedicationConfig {
+  code: Medication;
+  name: string;
+  manufacturer: string | null;
+  dosages: number[];
+  penStrengths: number[];
+  supportsMicrodosing: boolean;
+}
+
+export interface MedicationConfigResponse {
+  medications: MedicationConfig[];
+  microdoseAmounts: number[];
+  defaultDosesPerPen: number;
 }

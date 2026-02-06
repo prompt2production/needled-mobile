@@ -10,7 +10,7 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import ConfettiCannon from "react-native-confetti-cannon";
 
@@ -28,6 +28,7 @@ import {
   getDayAbbreviation,
 } from "@/hooks";
 import { PipWithBubble, PipState } from "@/components/pip";
+import { AppHeader, MenuDropdown } from "@/components/navigation";
 import { HabitType } from "@/types/api";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -320,6 +321,19 @@ function WeeklyGrid({ habitMap, selectedDate, onDateSelect }: WeeklyGridProps) {
 export default function CheckInScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const router = useRouter();
+
+  // Menu state
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  // Handle menu actions
+  const handleMenuLogAction = useCallback((action: 'injection' | 'weight') => {
+    if (action === 'injection') {
+      router.push('/modals/injection');
+    } else {
+      router.push('/modals/weigh-in');
+    }
+  }, [router]);
 
   // Selected date state
   const [selectedDate, setSelectedDate] = useState(() => getStartOfDay(new Date()));
@@ -513,21 +527,28 @@ export default function CheckInScreen() {
   // Loading state
   if (habitsLoading && !habitsData) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Habits" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2C9C91" />
           <Text className="text-gray-500 dark:text-gray-400 mt-4">
             Loading habits...
           </Text>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   // Error state
   if (habitsError) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Habits" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center p-6">
           <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             Oops!
@@ -542,12 +563,18 @@ export default function CheckInScreen() {
             <Text className="text-white font-semibold">Retry</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={["top"]}>
+    <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+      <AppHeader title="Habits" onMenuPress={() => setMenuVisible(true)} />
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -561,19 +588,8 @@ export default function CheckInScreen() {
           />
         }
       >
-        {/* Header with Date Selector */}
+        {/* Date Selector */}
         <View className="px-4 pt-4 pb-2">
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: "700",
-              color: isDark ? "#F9FAFB" : "#111827",
-              marginBottom: 8,
-            }}
-          >
-            Daily Check-in
-          </Text>
-
           {/* Date Navigation */}
           <View
             style={{
@@ -720,6 +736,13 @@ export default function CheckInScreen() {
         colors={["#14B8A6", "#2DD4BF", "#FB7185", "#FBBF24", "#22C55E", "#5EEAD4"]}
         autoStartDelay={0}
       />
-    </SafeAreaView>
+
+      {/* Menu Dropdown */}
+      <MenuDropdown
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        onLogAction={handleMenuLogAction}
+      />
+    </View>
   );
 }

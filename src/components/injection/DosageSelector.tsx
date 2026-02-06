@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, useColorScheme, TouchableOpacity, ScrollView } from 'react-native';
 import { Medication } from '@/types/api';
-import { MEDICATION_DOSAGES, hasDosageTracking } from '@/constants/dosages';
+import { useDosageValues, useHasDosageTracking } from '@/hooks/useMedicationConfig';
 
 interface DosageSelectorProps {
   medication: Medication;
@@ -26,12 +26,14 @@ export function DosageSelector({
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
+  // Use hooks for dynamic medication config
+  const hasDosageTrackingForMed = useHasDosageTracking(medication);
+  const dosageOptions = useDosageValues(medication);
+
   // Don't render for medications without dosage tracking
-  if (!hasDosageTracking(medication)) {
+  if (!hasDosageTrackingForMed) {
     return null;
   }
-
-  const dosageOptions = MEDICATION_DOSAGES[medication];
   const isTitrating = selectedDosage !== null && currentDosage !== null && selectedDosage !== currentDosage;
 
   return (

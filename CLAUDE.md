@@ -68,6 +68,33 @@ npm run web
 npm run adb:reverse
 ```
 
+## Building APKs for Testing (EAS Build)
+Use EAS Build to create APKs for distribution to testers without app store submission.
+
+```bash
+# Login to EAS (first time only)
+eas login
+
+# Build APK for Android testers (uses production API)
+eas build --platform android --profile preview
+
+# Build for iOS (requires Apple Developer account)
+eas build --platform ios --profile preview
+```
+
+### Build Profiles (eas.json)
+- **development** - Development client with tunnel URL for local testing
+- **preview** - APK/IPA for internal distribution to testers (uses production API)
+- **production** - App store submission builds (AAB for Android, IPA for iOS)
+
+### Distributing to Testers
+After the build completes, EAS provides a download link and QR code. Testers can:
+1. Open the link on their Android phone
+2. Download and install the APK
+3. Enable "Install from unknown sources" if prompted
+
+Build dashboard: https://expo.dev/accounts/consulcode/projects/needled-mobile
+
 ## Physical Device Development (Android via USB)
 When connecting a physical Android device via USB:
 

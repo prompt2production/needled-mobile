@@ -177,6 +177,11 @@ export default function SettingsScreen() {
             onPress={() => router.push('/settings/profile')}
           />
           <MenuItem
+            title="Pen & Dosing"
+            subtitle="Dosing mode, golden dose, pen position"
+            onPress={() => router.push('/settings/pen-dosing')}
+          />
+          <MenuItem
             title="Change Password"
             subtitle="Update your password"
             onPress={() => router.push('/settings/password')}

@@ -7,6 +7,8 @@ import {
   ProfileSettings,
   UpdateProfileRequest,
   NotificationPreferences,
+  UpdatePenDosingRequest,
+  PenDosingSettings,
 } from '../types/api';
 
 /**
@@ -88,5 +90,23 @@ export const updateNotificationPreferences = async (
     '/notifications/preferences',
     data
   );
+  return response.data;
+};
+
+/**
+ * Get pen and dosing settings
+ */
+export const getPenDosingSettings = async (): Promise<PenDosingSettings> => {
+  const response = await api.get<PenDosingSettings>('/settings/pen-dosing');
+  return response.data;
+};
+
+/**
+ * Update pen and dosing settings
+ */
+export const updatePenDosing = async (
+  data: UpdatePenDosingRequest
+): Promise<PenDosingSettings> => {
+  const response = await api.put<PenDosingSettings>('/settings/pen-dosing', data);
   return response.data;
 };

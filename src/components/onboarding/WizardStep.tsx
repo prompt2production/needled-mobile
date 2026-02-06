@@ -87,24 +87,24 @@ export function WizardStep({
             </View>
 
             {/* Content */}
-            <View className="px-6 flex-1">
+            <View className="px-6">
               {children}
             </View>
-          </ScrollView>
 
-          {/* Next Button */}
-          <View className="px-6 pb-6 pt-4">
-            <Button
-              onPress={handleNext}
-              variant="secondary"
-              size="lg"
-              fullWidth
-              disabled={isNextDisabled}
-              loading={isLoading}
-            >
-              {nextLabel}
-            </Button>
-          </View>
+            {/* Next Button - inside ScrollView, below content */}
+            <View className="px-6 pt-8 pb-6">
+              <Button
+                onPress={handleNext}
+                variant="secondary"
+                size="lg"
+                fullWidth
+                disabled={isNextDisabled}
+                loading={isLoading}
+              >
+                {nextLabel}
+              </Button>
+            </View>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

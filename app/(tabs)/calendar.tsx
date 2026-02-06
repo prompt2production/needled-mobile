@@ -16,7 +16,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
@@ -40,10 +40,24 @@ import {
   DayDetailSheet,
   MonthlyWins,
 } from '@/components/calendar';
+import { AppHeader, MenuDropdown } from '@/components/navigation';
 
 export default function CalendarScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const router = useRouter();
+
+  // Menu state
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  // Handle menu actions
+  const handleMenuLogAction = useCallback((action: 'injection' | 'weight') => {
+    if (action === 'injection') {
+      router.push('/modals/injection');
+    } else {
+      router.push('/modals/weigh-in');
+    }
+  }, [router]);
 
   // Current month state
   const today = new Date();
@@ -214,13 +228,6 @@ export default function CalendarScreen() {
     }
   }, [journeyData]);
 
-  // Handle share button press (trigger confetti)
-  const handleSharePress = useCallback(() => {
-    setConfettiCount(30);
-    setShowConfetti(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, []);
-
   // Check if viewing current month
   const isCurrentMonth =
     currentYear === today.getFullYear() && currentMonth === today.getMonth() + 1;
@@ -236,21 +243,28 @@ export default function CalendarScreen() {
   // Loading state
   if (monthLoading && !monthData) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={['top']}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Calendar" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2C9C91" />
           <Text className="text-gray-500 dark:text-gray-400 mt-4">
             Loading your journey...
           </Text>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   // Error state
   if (monthError) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={['top']}>
+      <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+        <AppHeader title="Calendar" onMenuPress={() => setMenuVisible(true)} />
         <View className="flex-1 items-center justify-center p-6">
           <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             Oops!
@@ -265,12 +279,19 @@ export default function CalendarScreen() {
             <Text className="text-white font-semibold">Retry</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+        <MenuDropdown
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          onLogAction={handleMenuLogAction}
+        />
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-dark-bg" edges={['top']}>
+    <View className="flex-1 bg-gray-50 dark:bg-dark-bg">
+      <AppHeader title="Calendar" onMenuPress={() => setMenuVisible(true)} />
+
       {/* Confetti */}
       {showConfetti && (
         <ConfettiCannon
@@ -349,7 +370,6 @@ export default function CalendarScreen() {
             }}
             weightUnit={weightUnit}
             monthName={`${getMonthName(currentMonth)} ${currentYear}`}
-            onSharePress={handleSharePress}
           />
         </Animated.View>
       </ScrollView>
@@ -382,6 +402,13 @@ export default function CalendarScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+
+      {/* Menu Dropdown */}
+      <MenuDropdown
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        onLogAction={handleMenuLogAction}
+      />
+    </View>
   );
 }

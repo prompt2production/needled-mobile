@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/authStore';
 import { ApiErrorResponse } from '../../services/api';
-import { Medication, InjectionDay, WeightUnit, RegisterRequest } from '../../types/api';
+import { Medication, InjectionDay, WeightUnit, RegisterRequest, DosingMode } from '../../types/api';
 import { NameStep } from './steps/NameStep';
 import { EmailStep } from './steps/EmailStep';
 import { PasswordStep } from './steps/PasswordStep';
-import { MedicationStep } from './steps/MedicationStep';
+import { MedicationDayStep } from './steps/MedicationDayStep';
+import { DosageConfigStep } from './steps/DosageConfigStep';
 import { WeightStep } from './steps/WeightStep';
 import { HeightStep } from './steps/HeightStep';
-
-// Steps: Name → Email → Password → Medication (with dosage) → Weight → Height = 6 total
-const TOTAL_STEPS = 6;
+import { DosingModeStep } from './steps/DosingModeStep';
+import { GoldenDoseStep } from './steps/GoldenDoseStep';
+import { PenPositionStep } from './steps/PenPositionStep';
+import { DEFAULT_DOSES_PER_PEN, calculateDosesPerPen } from '../../constants/dosages';
 
 export interface WizardData {
   name: string;
@@ -24,6 +26,13 @@ export interface WizardData {
   startWeight: string;
   goalWeight: string;
   height: string; // Stored in cm
+
+  // Pen & Dosing Settings
+  dosingMode: DosingMode | null;
+  penStrengthMg: number | null;
+  doseAmountMg: number | null;
+  tracksGoldenDose: boolean | null;
+  currentDoseInPen: number | null;
 }
 
 const initialData: WizardData = {
@@ -37,6 +46,13 @@ const initialData: WizardData = {
   startWeight: '',
   goalWeight: '',
   height: '',
+
+  // Pen & Dosing Settings
+  dosingMode: null,
+  penStrengthMg: null,
+  doseAmountMg: null,
+  tracksGoldenDose: null,
+  currentDoseInPen: null,
 };
 
 export function WizardContainer() {
@@ -47,7 +63,30 @@ export function WizardContainer() {
   const [data, setData] = useState<WizardData>(initialData);
   const [error, setError] = useState<string | null>(null);
 
-  const totalSteps = TOTAL_STEPS;
+  // Calculate doses per pen based on dosing mode and settings
+  const dosesPerPen = useMemo(() => {
+    if (data.dosingMode === 'MICRODOSE' && data.penStrengthMg && data.doseAmountMg) {
+      return calculateDosesPerPen(data.penStrengthMg, data.doseAmountMg);
+    }
+    return DEFAULT_DOSES_PER_PEN;
+  }, [data.dosingMode, data.penStrengthMg, data.doseAmountMg]);
+
+  // Step order: Name → Email → Password → DosingMode → MedicationDay → DosageConfig → GoldenDose → PenPosition → Weight → Height
+  const stepNames = [
+    'name',
+    'email',
+    'password',
+    'dosingMode',      // Choose standard vs microdosing first
+    'medicationDay',   // Medication + injection day
+    'dosageConfig',    // Dosage (standard) or pen config (microdose)
+    'goldenDose',
+    'penPosition',
+    'weight',
+    'height',
+  ];
+
+  const totalSteps = stepNames.length;
+  const currentStepName = stepNames[currentStep] || 'unknown';
 
   const updateData = <K extends keyof WizardData>(key: K, value: WizardData[K]) => {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -116,6 +155,14 @@ export function WizardContainer() {
         injectionDay: data.injectionDay,
         startingDosage: data.startingDosage ?? undefined,
         height: heightNum,
+
+        // Pen & Dosing Settings
+        dosingMode: data.dosingMode ?? 'STANDARD',
+        penStrengthMg: data.dosingMode === 'MICRODOSE' ? data.penStrengthMg ?? undefined : undefined,
+        doseAmountMg: data.dosingMode === 'MICRODOSE' ? data.doseAmountMg ?? undefined : undefined,
+        dosesPerPen: dosesPerPen,
+        tracksGoldenDose: data.tracksGoldenDose ?? false,
+        currentDoseInPen: data.currentDoseInPen ?? 1,
       };
 
       await register(registerData);
@@ -126,10 +173,6 @@ export function WizardContainer() {
       setError(apiError.message || 'Registration failed. Please try again.');
     }
   };
-
-  // Step order: Name → Email → Password → Medication (with dosage) → Weight → Height
-  const STEP_NAMES = ['name', 'email', 'password', 'medication', 'weight', 'height'];
-  const currentStepName = STEP_NAMES[currentStep] || 'unknown';
 
   // Render current step based on step name
   switch (currentStepName) {
@@ -169,15 +212,71 @@ export function WizardContainer() {
         />
       );
 
-    case 'medication':
+    case 'dosingMode':
       return (
-        <MedicationStep
+        <DosingModeStep
+          dosingMode={data.dosingMode}
+          onDosingModeChange={(value) => updateData('dosingMode', value)}
+          onNext={goNext}
+          onBack={goBack}
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+        />
+      );
+
+    case 'medicationDay':
+      return (
+        <MedicationDayStep
           medication={data.medication}
           injectionDay={data.injectionDay}
-          dosage={data.startingDosage}
           onMedicationChange={(value) => updateData('medication', value)}
           onInjectionDayChange={(value) => updateData('injectionDay', value)}
+          onNext={goNext}
+          onBack={goBack}
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+        />
+      );
+
+    case 'dosageConfig':
+      return (
+        <DosageConfigStep
+          dosingMode={data.dosingMode!}
+          medication={data.medication!}
+          // Standard mode fields
+          dosage={data.startingDosage}
           onDosageChange={(value) => updateData('startingDosage', value)}
+          // Microdose mode fields
+          penStrengthMg={data.penStrengthMg}
+          doseAmountMg={data.doseAmountMg}
+          onPenStrengthChange={(value) => updateData('penStrengthMg', value)}
+          onDoseAmountChange={(value) => updateData('doseAmountMg', value)}
+          onNext={goNext}
+          onBack={goBack}
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+        />
+      );
+
+    case 'goldenDose':
+      return (
+        <GoldenDoseStep
+          tracksGoldenDose={data.tracksGoldenDose}
+          onTracksGoldenDoseChange={(value) => updateData('tracksGoldenDose', value)}
+          onNext={goNext}
+          onBack={goBack}
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+        />
+      );
+
+    case 'penPosition':
+      return (
+        <PenPositionStep
+          currentDoseInPen={data.currentDoseInPen}
+          dosesPerPen={dosesPerPen}
+          tracksGoldenDose={data.tracksGoldenDose ?? false}
+          onCurrentDoseChange={(value) => updateData('currentDoseInPen', value)}
           onNext={goNext}
           onBack={goBack}
           currentStep={currentStep}

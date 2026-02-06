@@ -17,6 +17,7 @@ export default function SettingsLayout() {
       <Stack.Screen name="index" options={{ title: "Settings" }} />
       <Stack.Screen name="profile" options={{ title: "Profile" }} />
       <Stack.Screen name="preferences" options={{ title: "Preferences" }} />
+      <Stack.Screen name="pen-dosing" options={{ title: "Pen & Dosing" }} />
     </Stack>
   );
 }

@@ -14,6 +14,9 @@ import {
 } from '../types/api';
 import { injectionKeys, dashboardKeys } from './useDashboard';
 
+// Default for backwards compatibility
+const DEFAULT_DOSES_PER_PEN = 4;
+
 // Extended query keys for injection history
 export const injectionQueryKeys = {
   ...injectionKeys,
@@ -52,7 +55,56 @@ export function useInjectionHistory(limit: number = 5) {
 }
 
 /**
+ * Calculate the next dose number based on current status
+ * Handles dynamic dosesPerPen and golden dose logic
+ */
+function calculateNextDose(
+  currentNextDose: number,
+  dosesPerPen: number,
+  tracksGoldenDose: boolean,
+  isGoldenDose: boolean
+): number {
+  // If this was a golden dose, next dose is 1 (new pen)
+  if (isGoldenDose) {
+    return 1;
+  }
+
+  // If we just completed the last standard dose
+  if (currentNextDose >= dosesPerPen) {
+    // If golden dose is tracked and available, that's next
+    // Otherwise, start a new pen
+    return tracksGoldenDose ? dosesPerPen + 1 : 1;
+  }
+
+  // Normal increment
+  return currentNextDose + 1;
+}
+
+/**
+ * Calculate doses remaining after logging an injection
+ */
+function calculateDosesRemaining(
+  currentNextDose: number,
+  dosesPerPen: number,
+  isGoldenDose: boolean
+): number {
+  // If this was a golden dose, new pen has full doses
+  if (isGoldenDose) {
+    return dosesPerPen;
+  }
+
+  // If we just completed the last standard dose
+  if (currentNextDose >= dosesPerPen) {
+    return dosesPerPen; // New pen (API will handle golden dose state)
+  }
+
+  // Normal decrement
+  return dosesPerPen - currentNextDose;
+}
+
+/**
  * Log injection mutation with optimistic updates
+ * Now supports dynamic dosesPerPen and golden dose tracking
  */
 export function useLogInjection() {
   const { user } = useAuthStore();
@@ -60,17 +112,24 @@ export function useLogInjection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { site: InjectionSite; notes?: string; date?: string; dosageMg?: number }) =>
+    mutationFn: (data: {
+      site: InjectionSite;
+      notes?: string;
+      date?: string;
+      dosageMg?: number;
+      isGoldenDose?: boolean;
+    }) =>
       injectionsService.logInjection({
         userId: userId!,
         site: data.site,
         notes: data.notes,
         date: data.date,
         dosageMg: data.dosageMg,
+        isGoldenDose: data.isGoldenDose,
       }),
 
     // Optimistic update
-    onMutate: async ({ site, notes, date, dosageMg }) => {
+    onMutate: async ({ site, notes, date, dosageMg, isGoldenDose = false }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: injectionKeys.status(userId || '') });
       await queryClient.cancelQueries({ queryKey: injectionQueryKeys.history(userId || '') });
@@ -85,6 +144,27 @@ export function useLogInjection() {
 
       // Optimistically update status to 'done'
       if (previousStatus) {
+        const dosesPerPen = previousStatus.dosesPerPen || DEFAULT_DOSES_PER_PEN;
+        const tracksGoldenDose = previousStatus.tracksGoldenDose || false;
+
+        const nextDose = calculateNextDose(
+          previousStatus.nextDose,
+          dosesPerPen,
+          tracksGoldenDose,
+          isGoldenDose
+        );
+
+        const dosesRemaining = calculateDosesRemaining(
+          previousStatus.nextDose,
+          dosesPerPen,
+          isGoldenDose
+        );
+
+        // Determine golden dose availability
+        const isGoldenDoseAvailable = !isGoldenDose &&
+          tracksGoldenDose &&
+          previousStatus.nextDose >= dosesPerPen;
+
         queryClient.setQueryData<InjectionStatusResponse>(
           injectionKeys.status(userId || ''),
           {
@@ -97,13 +177,18 @@ export function useLogInjection() {
               site,
               doseNumber: previousStatus.nextDose,
               dosageMg: dosageMg ?? previousStatus.currentDosageMg ?? null,
+              isGoldenDose,
               date: date || new Date().toISOString(),
               notes: notes || null,
             },
             currentDose: previousStatus.nextDose,
-            nextDose: previousStatus.nextDose === 4 ? 1 : ((previousStatus.nextDose + 1) as 1 | 2 | 3 | 4),
-            dosesRemaining: previousStatus.nextDose === 4 ? 4 : previousStatus.dosesRemaining - 1,
+            nextDose,
+            dosesRemaining,
             currentDosageMg: dosageMg ?? previousStatus.currentDosageMg ?? null,
+            dosesPerPen,
+            tracksGoldenDose,
+            isGoldenDoseAvailable: isGoldenDoseAvailable && !isGoldenDose,
+            isOnGoldenDose: !isGoldenDose && tracksGoldenDose && nextDose > dosesPerPen,
           }
         );
       }
@@ -117,6 +202,7 @@ export function useLogInjection() {
           site,
           doseNumber: previousStatus?.nextDose || 1,
           dosageMg: dosageMg ?? previousStatus?.currentDosageMg ?? null,
+          isGoldenDose,
           notes: notes || null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

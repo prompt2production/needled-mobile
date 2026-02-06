@@ -43,6 +43,7 @@ export const mockInjectionStatus: InjectionStatusResponse = {
     site: "ABDOMEN_LEFT",
     doseNumber: 2,
     dosageMg: 0.5,
+    isGoldenDose: false,
     date: "2024-01-17T12:00:00.000Z",
     notes: null,
   },
@@ -51,6 +52,10 @@ export const mockInjectionStatus: InjectionStatusResponse = {
   nextDose: 3,
   dosesRemaining: 2,
   currentDosageMg: 0.5,
+  dosesPerPen: 4,
+  tracksGoldenDose: false,
+  isGoldenDoseAvailable: false,
+  isOnGoldenDose: false,
 };
 
 // Mock today's habits (2 of 3 complete - tap Exercise to trigger confetti!)
